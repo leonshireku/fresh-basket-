@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshBasket | Sign In</title>
+    <!-- Google Fonts: Playfair Display & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #854627;
+            --primary-dark: #6f371c;
+            --primary-light: #F1DFCF;
+            --accent: #CF8E54;
+            --olive: #7B7457;
+            --text-main: #1A1817;
+            --text-muted: #7B7457;
+            --border-color: #ebdcd0;
+            --bg-light: #FEF9F5;
+            --white: #ffffff;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #1A1817;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .login-wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* LEFT SIDE: HERO VISUAL WITH SLIGHTLY DARK OVERLAY (NOT GREEN) */
+        .hero-side {
+            flex: 1.1;
+            position: relative;
+            background: linear-gradient(rgba(0, 0, 0, 0.40), rgba(0, 0, 0, 0.60)),
+                        url('hero.jpg') center center / cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 48px;
+            color: var(--white);
+            overflow: hidden;
+        }
+
+        .hero-top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .back-to-store {
+            color: var(--white);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 9px 18px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .back-to-store:hover {
+            background: rgba(0, 0, 0, 0.6);
+            transform: translateX(-3px);
+        }
+
+        .hero-content {
+            z-index: 2;
+            max-width: 540px;
+            margin: auto 0;
+            padding: 20px 0;
+        }
+
+        .hero-content h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 44px;
+            line-height: 1.2;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+            text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+        }
+
+        .hero-content p {
+            font-size: 17px;
+            line-height: 1.6;
+            opacity: 0.95;
+            margin-bottom: 26px;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            padding: 12px 18px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .feature-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .hero-footer {
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            opacity: 0.9;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 20px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* RIGHT SIDE: AUTHENTICATION FORM */
+        .form-side {
+            flex: 0.9;
+            background: var(--bg-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 28px;
+            overflow-y: auto;
+        }
+
+        .form-card {
+            width: 100%;
+            max-width: 440px;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 42px 34px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1.5px solid var(--border-color);
+        }
+
+        .card-header {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .card-header h2 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .card-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* FORM ELEMENTS */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 7px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-wrap i.field-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--olive);
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        .input-wrap input,
+        .input-wrap select {
+            width: 100%;
+            padding: 13px 14px 13px 42px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-main);
+            outline: none;
+            background: #FEF9F5;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .input-wrap input:focus,
+        .input-wrap select:focus {
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(133, 70, 39, 0.15);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--olive);
+            cursor: pointer;
+            font-size: 15px;
+            padding: 4px;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary);
+        }
+
+        /* ROLE SELECTOR PILLS */
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .role-pill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            background: #FEF9F5;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .role-pill input {
+            display: none;
+        }
+
+        .role-pill.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        /* SUBMIT BUTTON */
+        .btn-submit {
+            width: 100%;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-submit:active {
+            transform: translateY(1px);
+        }
+
+        .auth-switch-text {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .auth-switch-text a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .auth-switch-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1024px) {
+            .hero-side {
+                padding: 36px 30px;
+            }
+            .hero-content h1 {
+                font-size: 34px;
+            }
+        }
+
+        @media (max-width: 860px) {
+            .login-wrapper {
+                flex-direction: column;
+            }
+
+            .hero-side {
+                flex: none;
+                min-height: 280px;
+                padding: 28px 24px;
+                justify-content: flex-start;
+            }
+
+            .hero-content {
+                margin: 20px 0 0 0;
+                padding: 0;
+            }
+
+            .hero-content h1 {
+                font-size: 26px;
+                margin-bottom: 8px;
+            }
+
+            .hero-content p,
+            .features-list,
+            .hero-footer {
+                display: none;
+            }
+
+            .form-side {
+                flex: 1;
+                padding: 30px 18px;
+            }
+
+            .form-card {
+                padding: 28px 20px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-wrapper">
+
+        <!-- LEFT SIDE: hero.jpg Groceries Banner with slightly dark overlay -->
+        <div class="hero-side">
+            <div class="hero-top-nav">
+                <div class="brand-badge">
+                    🥬 FreshBasket
+                </div>
+                <a href="index.html" class="back-to-store">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Store
+                </a>
+            </div>
+
+            <div class="hero-content">
+                <h1>Fresh Groceries, Everyday.</h1>
+                <p>Shop fresh fruits, vegetables, and daily household essentials delivered straight to your door.</p>
+
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fa-solid fa-carrot"></i></div>
+                        <span>Fresh fruits and vegetables daily</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fa-solid fa-truck"></i></div>
+                        <span>Fast, reliable delivery to your door</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <span>Easy and secure shopping</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-footer">
+                <span>© <span id="copyright-year">2026</span> FreshBasket. All Rights Reserved.</span>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE: Auth Card -->
+        <div class="form-side">
+            <div class="form-card">
+                <div class="card-header">
+                    <h2 id="form-heading">Sign In</h2>
+                    <p id="form-subheading">Welcome back! Please enter your details.</p>
+                </div>
+
+                <!-- LOGIN FORM -->
+                <form id="login-form-element" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="login-email">Email Address</label>
+                        <div class="input-wrap">
+                            <i class="fa-solid fa-envelope field-icon"></i>
+                            <input
+                                type="email"
+                                id="login-email"
+                                placeholder="name@example.com"
+                                required
+                                autocomplete="username"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <div class="input-wrap">
+                            <i class="fa-solid fa-lock field-icon"></i>
+                            <input
+                                type="password"
+                                id="login-password"
+                                placeholder="••••••••"
+                                required
+                                autocomplete="current-password"
+                            >
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('login-password', this)">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sign In Role</label>
+                        <div class="role-selector">
+                            <label class="role-pill active" id="role-pill-client">
+                                <input type="radio" name="login-role" value="client" checked onchange="updateRolePills()">
+                                <i class="fa-solid fa-basket-shopping"></i> Client
+                            </label>
+                            <label class="role-pill" id="role-pill-admin">
+                                <input type="radio" name="login-role" value="admin" onchange="updateRolePills()">
+                                <i class="fa-solid fa-shield-halved"></i> Admin
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+                    </button>
+                </form>
+
+                <!-- REGISTER FORM -->
+                <form id="register-form-element" style="display: none;" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="reg-name">Full Name</label>
+                        <div class="input-wrap">
+                            <i class="fa-solid fa-user field-icon"></i>
+                            <input
+                                type="text"
+                                id="reg-name"
+                                placeholder="e.g. Jane Doe"
+                                required
+                                autocomplete="name"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg-email">Email Address</label>
+                        <div class="input-wrap">
+                            <i class="fa-solid fa-envelope field-icon"></i>
+                            <input
+                                type="email"
+                                id="reg-email"
+                                placeholder="e.g. jane@example.com"
+                                required
+                                autocomplete="email"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg-password">Create Password</label>
+                        <div class="input-wrap">
+                            <i class="fa-solid fa-lock field-icon"></i>
+                            <input
+                                type="password"
+                                id="reg-password"
+                                placeholder="At least 6 characters"
+                                required
+                                minlength="6"
+                                autocomplete="new-password"
+                            >
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('reg-password', this)">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Account Role</label>
+                        <div class="role-selector">
+                            <label class="role-pill active" id="reg-pill-client">
+                                <input type="radio" name="reg-role" value="client" checked onchange="updateRegPills()">
+                                <i class="fa-solid fa-user"></i> Client
+                            </label>
+                            <label class="role-pill" id="reg-pill-admin">
+                                <input type="radio" name="reg-role" value="admin" onchange="updateRegPills()">
+                                <i class="fa-solid fa-shield-halved"></i> Store Admin
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="fa-solid fa-user-plus"></i> Create Account
+                    </button>
+                </form>
+
+                <div class="auth-switch-text" id="auth-switch-text">
+                    Don't have an account? <a href="#" onclick="switchTab('register'); return false;">Sign Up</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Set dynamic copyright year
+        document.getElementById("copyright-year").textContent = new Date().getFullYear();
+
+        function togglePasswordVisibility(fieldId, btn) {
+            const input = document.getElementById(fieldId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-regular fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-regular fa-eye';
+            }
+        }
+
+        function updateRolePills() {
+            const role = document.querySelector('input[name="login-role"]:checked').value;
+            document.getElementById("role-pill-client").classList.toggle("active", role === "client");
+            document.getElementById("role-pill-admin").classList.toggle("active", role === "admin");
+        }
+
+        function updateRegPills() {
+            const role = document.querySelector('input[name="reg-role"]:checked').value;
+            document.getElementById("reg-pill-client").classList.toggle("active", role === "client");
+            document.getElementById("reg-pill-admin").classList.toggle("active", role === "admin");
+        }
+
+        function switchTab(mode) {
+            const loginForm = document.getElementById("login-form-element");
+            const regForm = document.getElementById("register-form-element");
+            const heading = document.getElementById("form-heading");
+            const subheading = document.getElementById("form-subheading");
+            const switchText = document.getElementById("auth-switch-text");
+
+            if (mode === 'login') {
+                loginForm.style.display = "block";
+                regForm.style.display = "none";
+                heading.textContent = "Sign In";
+                subheading.textContent = "Welcome back! Please enter your details.";
+                switchText.innerHTML = `Don't have an account? <a href="#" onclick="switchTab('register'); return false;">Sign Up</a>`;
+            } else {
+                loginForm.style.display = "none";
+                regForm.style.display = "block";
+                heading.textContent = "Create Account";
+                subheading.textContent = "Enter your details to create an account.";
+                switchText.innerHTML = `Already have an account? <a href="#" onclick="switchTab('login'); return false;">Sign In</a>`;
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById("login-email").value.trim().toLowerCase();
+            const password = document.getElementById("login-password").value;
+            const chosenRole = document.querySelector('input[name="login-role"]:checked').value;
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, role: chosenRole })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    localStorage.setItem("currentUser", JSON.stringify(data.user));
+                    alert(data.message || `Welcome back, ${data.user.name}!`);
+                    window.location.href = "index.html";
+                } else {
+                    alert(data.message || "Invalid credentials.");
+                }
+            } catch (err) {
+                console.error("Backend error:", err);
+                alert("Failed to connect to the backend server. Please verify the server is running.");
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById("reg-name").value.trim();
+            const email = document.getElementById("reg-email").value.trim().toLowerCase();
+            const password = document.getElementById("reg-password").value;
+            const role = document.querySelector('input[name="reg-role"]:checked').value;
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, role })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    localStorage.setItem("currentUser", JSON.stringify(data.user));
+                    alert(`Account created successfully! Welcome, ${data.user.name}.`);
+                    window.location.href = "index.html";
+                } else {
+                    alert(data.message || "Registration failed.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Network error connecting to the backend server.");
+            }
+        }
+    </script>
+</body>
+</html>

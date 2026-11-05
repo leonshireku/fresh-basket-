@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "Store Administrator",
+    "email": "admin@freshbasket.com",
+    "password": "admin123",
+    "role": "admin"
+  },
+  {
+    "id": 2,
+    "name": "Jane Client",
+    "email": "client@freshbasket.com",
+    "password": "client123",
+    "role": "client"
+  }
+]

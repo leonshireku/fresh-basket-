@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "name": "Fresh Tomatoes",
+    "category": "Vegetables",
+    "price": 120,
+    "image": "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=500"
+  },
+  {
+    "id": 2,
+    "name": "Red Onions",
+    "category": "Vegetables",
+    "price": 150,
+    "image": "https://images.unsplash.com/photo-1508747703725-719777637510?w=500"
+  },
+  {
+    "id": 3,
+    "name": "Bananas",
+    "category": "Fruits",
+    "price": 100,
+    "image": "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500"
+  },
+  {
+    "id": 4,
+    "name": "Apples",
+    "category": "Fruits",
+    "price": 280,
+    "image": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=500"
+  },
+  {
+    "id": 5,
+    "name": "Fresh Milk",
+    "category": "Dairy",
+    "price": 75,
+    "image": "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500"
+  },
+  {
+    "id": 6,
+    "name": "Eggs",
+    "category": "Dairy",
+    "price": 480,
+    "image": "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=500"
+  },
+  {
+    "id": 7,
+    "name": "Rice",
+    "category": "Groceries",
+    "price": 320,
+    "image": "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500"
+  },
+  {
+    "id": 8,
+    "name": "Cooking Oil",
+    "category": "Groceries",
+    "price": 250,
+    "image": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  }
+]
