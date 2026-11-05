@@ -685,14 +685,28 @@ nav#main-nav a.nav-link.active {
     border-color: var(--primary);
 }
 
+.category-track-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+}
+
 .category-icon-track {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    gap: 32px;
     overflow-x: auto;
-    padding-bottom: 10px;
+    padding: 10px 4px 16px 4px;
     scrollbar-width: none;
+    -ms-overflow-style: none;
+    cursor: grab;
+    user-select: none;
+}
+
+.category-icon-track:active {
+    cursor: grabbing;
 }
 
 .category-icon-track::-webkit-scrollbar {
@@ -705,12 +719,13 @@ nav#main-nav a.nav-link.active {
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    flex-shrink: 0;
-    transition: transform 0.2s ease;
+    flex: 0 0 auto;
+    min-width: 82px;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .category-icon-item:hover {
-    transform: translateY(-4px);
+    transform: translateY(-5px) scale(1.05);
 }
 
 .icon-avatar {

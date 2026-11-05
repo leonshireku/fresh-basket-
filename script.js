@@ -119,11 +119,49 @@ function filterProducts(category) {
     }
 }
 
+// SMOOTH AUTO-SCROLLING CATEGORIES TO THE LEFT WITH INFINITE LOOP
+let categoryScrollAnimFrame = null;
+let isCategoryTrackPaused = false;
+
+function initCategoryAutoScroll() {
+    const track = document.getElementById("category-icon-track");
+    if (!track) return;
+
+    let currentPos = track.scrollLeft;
+    const speed = 0.85; // Silky smooth speed in pixels per frame
+
+    track.addEventListener("mouseenter", () => { isCategoryTrackPaused = true; });
+    track.addEventListener("mouseleave", () => { isCategoryTrackPaused = false; });
+    track.addEventListener("touchstart", () => { isCategoryTrackPaused = true; }, { passive: true });
+    track.addEventListener("touchend", () => { isCategoryTrackPaused = false; }, { passive: true });
+
+    function autoScrollStep() {
+        if (!isCategoryTrackPaused) {
+            currentPos += speed;
+            const halfWidth = track.scrollWidth / 2;
+            if (currentPos >= halfWidth) {
+                currentPos -= halfWidth;
+            }
+            track.scrollLeft = currentPos;
+        } else {
+            currentPos = track.scrollLeft;
+        }
+        categoryScrollAnimFrame = requestAnimationFrame(autoScrollStep);
+    }
+
+    if (categoryScrollAnimFrame) cancelAnimationFrame(categoryScrollAnimFrame);
+    categoryScrollAnimFrame = requestAnimationFrame(autoScrollStep);
+}
+
 // SCROLL CATEGORIES ARROWS
 function scrollCategories(offset) {
     const track = document.getElementById("category-icon-track");
     if (track) {
+        isCategoryTrackPaused = true;
         track.scrollBy({ left: offset, behavior: "smooth" });
+        setTimeout(() => {
+            isCategoryTrackPaused = false;
+        }, 800);
     }
 }
 
@@ -593,6 +631,7 @@ updateAccountLink();
 updateCopyright();
 initScrollHeader();
 initHeroBackgroundSlider();
+initCategoryAutoScroll();
 
 // AUTO-CLOSE MOBILE MENU ON LINK CLICK
 document.querySelectorAll("#main-nav a").forEach(link => {
