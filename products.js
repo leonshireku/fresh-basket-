@@ -23,11 +23,14 @@ async function fetchProducts() {
 function toggleNav() {
     const nav = document.getElementById("main-nav");
     const icon = document.getElementById("toggle-icon");
+    const subNav = document.querySelector(".sub-nav-bar");
+    if (!nav) return;
     nav.classList.toggle("open");
+    if (subNav) subNav.classList.toggle("open");
     if (nav.classList.contains("open")) {
-        icon.className = "fa-solid fa-xmark";
+        if (icon) icon.className = "fa-solid fa-xmark";
     } else {
-        icon.className = "fa-solid fa-bars";
+        if (icon) icon.className = "fa-solid fa-bars";
     }
 }
 
@@ -589,3 +592,13 @@ updateCopyright();
 initScrollHeader();
 initHeroBackgroundSlider();
 initCountdown();
+
+// AUTO-CLOSE MOBILE MENU ON LINK CLICK
+document.querySelectorAll("#main-nav a").forEach(link => {
+    link.addEventListener("click", () => {
+        const nav = document.getElementById("main-nav");
+        if (nav && nav.classList.contains("open")) {
+            toggleNav();
+        }
+    });
+});
