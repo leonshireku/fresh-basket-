@@ -135,34 +135,6 @@ header.header-scrolled {
     gap: 24px;
 }
 
-.header-support-pill {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.header-support-pill .support-icon {
-    font-size: 28px;
-    color: var(--primary);
-}
-
-.header-support-pill .support-text {
-    display: flex;
-    flex-direction: column;
-}
-
-.header-support-pill .phone {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--primary);
-    line-height: 1.2;
-}
-
-.header-support-pill .label {
-    font-size: 11px;
-    color: var(--text-muted);
-}
-
 .header-action-icons {
     display: flex;
     align-items: center;
