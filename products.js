@@ -238,10 +238,10 @@ function updateAccountLink() {
 
         if (container) {
             container.innerHTML = `
-                <div class="user-chip">
+                <div class="user-chip" title="Signed in as ${currentUser.name} (${role})">
                     ${roleBadge}
-                    <span>${currentUser.name}</span>
-                    <button class="btn-logout" onclick="logout()" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    <span class="user-chip-name">${currentUser.name}</span>
+                    <button class="btn-logout" onclick="logout()" title="Logout" aria-label="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
                 </div>
             `;
         }
@@ -268,8 +268,9 @@ function updateAccountLink() {
     } else {
         if (container) {
             container.innerHTML = `
-                <a href="login.html" class="btn btn-nav-login">
-                    <i class="fa-solid fa-right-to-bracket"></i> Login / Register
+                <a href="login.html" class="btn btn-nav-login" title="Login / Register" aria-label="Login / Register">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span class="nav-login-text">Login / Register</span>
                 </a>
             `;
         }
