@@ -49,14 +49,27 @@ function displayProducts(list = products) {
     }
 
     list.forEach(product => {
+        const oldPrice = Math.round(product.price * 1.25);
         container.innerHTML += `
             <div class="product">
-                <img src="${product.image}" alt="${product.name}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=500'">
+                <div class="product-img-box">
+                    <img src="${product.image}" alt="${product.name}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=500'">
+                </div>
+                <div class="product-rating">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
                 <h3>${product.name}</h3>
-                <p>${product.category}</p>
-                <strong>KSh ${product.price}</strong>
-                <button class="btn" onclick="addToCart(${product.id})">
-                    <i class="fa-solid fa-cart-plus" aria-hidden="true"></i> Add to Cart
+                <div class="product-cat-label">${product.category}</div>
+                <div class="product-pricing">
+                    <strong>KSh ${product.price}</strong>
+                    <span class="old-price">KSh ${oldPrice}</span>
+                </div>
+                <button class="btn-add-cart" onclick="addToCart(${product.id})">
+                    <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Add to Cart
                 </button>
             </div>
         `;
@@ -78,6 +91,16 @@ if (searchInput) {
 
 // FILTER PRODUCTS BY CATEGORY
 function filterProducts(category) {
+    const buttons = document.querySelectorAll("#category-filter-buttons button");
+    buttons.forEach(btn => {
+        if (btn.textContent.trim().toLowerCase().includes(category.toLowerCase()) || 
+           (category === "All" && btn.textContent.trim().toLowerCase().includes("all"))) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    });
+
     if (category === "All") {
         displayProducts(products);
     } else {
@@ -86,6 +109,45 @@ function filterProducts(category) {
         );
         displayProducts(filtered);
     }
+
+    const prodSec = document.getElementById("products");
+    if (prodSec) {
+        prodSec.scrollIntoView({ behavior: "smooth" });
+    }
+}
+
+// SCROLL CATEGORIES ARROWS
+function scrollCategories(offset) {
+    const track = document.getElementById("category-icon-track");
+    if (track) {
+        track.scrollBy({ left: offset, behavior: "smooth" });
+    }
+}
+
+// LIVE COUNTDOWN TIMER FOR DEALS OF THE WEEK
+function initCountdown() {
+    let totalSeconds = (364 * 86400) + (8 * 3600) + (15 * 60) + 21;
+    const daysEl = document.getElementById("cd-days");
+    const hoursEl = document.getElementById("cd-hours");
+    const minsEl = document.getElementById("cd-mins");
+    const secsEl = document.getElementById("cd-secs");
+
+    if (!daysEl) return;
+
+    setInterval(() => {
+        if (totalSeconds > 0) {
+            totalSeconds--;
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
+            const mins = Math.floor((totalSeconds % 3600) / 60);
+            const secs = totalSeconds % 60;
+
+            daysEl.textContent = days;
+            hoursEl.textContent = hours < 10 ? "0" + hours : hours;
+            minsEl.textContent = mins < 10 ? "0" + mins : mins;
+            secsEl.textContent = secs < 10 ? "0" + secs : secs;
+        }
+    }, 1000);
 }
 
 // ADD TO CART
@@ -526,3 +588,4 @@ updateAccountLink();
 updateCopyright();
 initScrollHeader();
 initHeroBackgroundSlider();
+initCountdown();

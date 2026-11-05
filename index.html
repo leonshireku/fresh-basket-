@@ -14,60 +14,249 @@
 </head>
 <body>
 
-<!-- ROLE BANNER NOTIFICATION (Shows logged-in state) -->
-<div id="role-banner" class="role-banner" style="display: none;">
-    <div class="role-banner-content">
-        <span id="role-banner-text"></span>
-        <div class="role-banner-actions">
-            <a href="login.html" class="btn-switch-account"><i class="fa-solid fa-arrows-rotate"></i> Switch Role / Account</a>
+<!-- TOP ANNOUNCEMENT & CONTACT BAR -->
+<div class="top-bar">
+    <div class="top-bar-inner">
+        <div class="top-bar-contact">
+            <span><i class="fa-solid fa-phone"></i> +1 (700) 230-0035</span>
+            <span class="sep">|</span>
+            <span><i class="fa-solid fa-envelope"></i> company@gmail.com</span>
+            <span class="sep">|</span>
+            <span><i class="fa-solid fa-location-dot"></i> New York, United States</span>
+        </div>
+        <div class="top-bar-right">
+            <!-- Dynamic Role Banner if logged in -->
+            <span id="role-banner-text" class="top-role-text" style="display: none;"></span>
+            <div class="top-socials">
+                <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            </div>
         </div>
     </div>
 </div>
 
-<header>
-    <div class="logo">🥬 FreshBasket</div>
-
-    <!-- Mobile Actions: Cart Icon beside Hamburger Menu -->
-    <div class="header-right-actions">
-        <a href="#cart" class="mobile-cart-btn" id="mobile-cart-btn" aria-label="Shopping Cart">
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span class="mobile-cart-badge" id="mobile-cart-count">0</span>
+<!-- MAIN STICKY NAVIGATION HEADER -->
+<header id="main-header">
+    <div class="header-main-row">
+        <!-- Logo -->
+        <a href="#home" class="logo">
+            <span class="logo-leaf"><i class="fa-solid fa-leaf"></i></span>
+            <span class="logo-name">Fresh<strong>mat</strong></span>
         </a>
-        <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle navigation menu" onclick="toggleNav()">
-            <i class="fa-solid fa-bars" id="toggle-icon"></i>
-        </button>
+
+        <!-- Center Search Bar -->
+        <div class="header-search-wrap">
+            <input type="text" id="search" placeholder="Search your product..." aria-label="Search your product">
+            <button class="search-submit-btn" aria-label="Submit Search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </div>
+
+        <!-- Right Support Info & Actions -->
+        <div class="header-right-group">
+            <div class="header-support-pill">
+                <i class="fa-solid fa-headphones-simple support-icon"></i>
+                <div class="support-text">
+                    <span class="phone">55 0562-256</span>
+                    <span class="label">24/7 Support Center</span>
+                </div>
+            </div>
+
+            <div class="header-action-icons">
+                <a href="#products" class="action-btn-circle" title="Wishlist" aria-label="Wishlist">
+                    <i class="fa-regular fa-heart"></i>
+                    <span class="badge-count">0</span>
+                </a>
+                <a href="#cart" class="action-btn-circle" id="mobile-cart-btn" title="Cart" aria-label="Shopping Cart">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="badge-count" id="mobile-cart-count">0</span>
+                </a>
+                <div id="account-link" class="nav-account-container">
+                    <!-- Dynamic Role & User / Login button -->
+                </div>
+                <button class="mobile-toggle-btn" id="mobile-toggle" aria-label="Toggle navigation menu" onclick="toggleNav()">
+                    <i class="fa-solid fa-bars" id="toggle-icon"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <nav id="main-nav">
-        <a href="#home"><i class="fa-solid fa-house" aria-hidden="true"></i> Home</a>
-        <a href="#products"><i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i> Products</a>
-        <a href="#cart" id="cart-nav-link"><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Cart (<span id="cart-count">0</span>)</a>
-        <a href="#admin-panel" id="admin-nav-link" class="nav-admin-link" style="display: none;"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> Admin Dashboard</a>
-        <div id="account-link" class="nav-account-container">
-            <!-- Dynamic Role & User / Login button -->
+    <!-- SUB-NAVIGATION BAR (Browse Categories & Links) -->
+    <div class="sub-nav-bar">
+        <div class="sub-nav-inner">
+            <div class="categories-dropdown-btn" onclick="document.getElementById('quick-categories').scrollIntoView({behavior: 'smooth'})">
+                <i class="fa-solid fa-bars"></i>
+                <span>Browse Categories</span>
+                <i class="fa-solid fa-chevron-down arrow-down"></i>
+            </div>
+
+            <nav id="main-nav">
+                <a href="#home" class="nav-link active">Home <i class="fa-solid fa-chevron-down nav-sub-icon"></i></a>
+                <a href="#quick-categories" class="nav-link">Shop <i class="fa-solid fa-chevron-down nav-sub-icon"></i></a>
+                <a href="#promo-banners" class="nav-link">Blog</a>
+                <a href="#deals-week" class="nav-link">Pages <i class="fa-solid fa-chevron-down nav-sub-icon"></i></a>
+                <a href="#cart" class="nav-link" id="cart-nav-link">Cart (<span id="cart-count">0</span>)</a>
+                <a href="#admin-panel" id="admin-nav-link" class="nav-admin-link" style="display: none;"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+            </nav>
         </div>
-    </nav>
+    </div>
 </header>
 
-<section class="hero" id="home">
-    <!-- Changing Background Slideshow -->
-    <div class="hero-bg-slider" aria-hidden="true">
-        <div class="hero-bg-slide active" style="background-image: url('hero_background.jpg');"></div>
-        <div class="hero-bg-slide" style="background-image: url('hero_2.png');"></div>
-        <div class="hero-bg-slide" style="background-image: url('hero.jpg');"></div>
-        <div class="hero-bg-overlay"></div>
-    </div>
+<!-- HERO BENTO GRID SECTION (Matching Reference Image) -->
+<section class="hero-bento-section" id="home">
+    <div class="hero-bento-grid">
+        <!-- Main Hero Card (Left) -->
+        <div class="hero-main-card">
+            <div class="hero-main-content">
+                <span class="hero-subtag">Organic 100% Genuine Product</span>
+                <h1>Our <span class="highlight-green">Garden's</span> Most Favorite Food</h1>
+                <p>Fresh organic groceries, vegetables, and household essentials directly from the farm to your door.</p>
+                <div class="hero-cta-group">
+                    <a href="#products" class="btn btn-primary"><i class="fa-solid fa-basket-shopping"></i> Shop Now</a>
+                    <a href="login.html" class="btn btn-outline" id="hero-auth-btn"><i class="fa-solid fa-user"></i> Account & Roles</a>
+                </div>
+                <div class="hero-carousel-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+            <div class="hero-main-visual">
+                <img src="hero_3.png" alt="Fresh organic vegetables farmer" class="hero-main-img">
+            </div>
+        </div>
 
-    <div class="hero-content">
-        <h1>Fresh Groceries Delivered To Your Door</h1>
-        <p>Shop fresh fruits, vegetables, and household essentials with easy, fast home delivery.</p>
-        <div class="hero-actions">
-            <a href="#products" class="btn"><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> Shop Now</a>
-            <a href="login.html" class="btn btn-secondary" id="hero-auth-btn"><i class="fa-solid fa-user"></i> Account & Roles</a>
+        <!-- Side Stacked Cards (Right) -->
+        <div class="hero-side-cards">
+            <!-- Top Side Card (Peach) -->
+            <div class="side-card side-card-peach">
+                <div class="side-card-text">
+                    <span class="side-tag tag-peach">Summer Offer</span>
+                    <h3>Healthy Organic Food</h3>
+                    <a href="#products" onclick="filterProducts('Vegetables')" class="btn-side-shop">Shop Now</a>
+                </div>
+                <div class="side-card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400" alt="Healthy Organic Carrots">
+                </div>
+            </div>
+
+            <!-- Bottom Side Card (Mint) -->
+            <div class="side-card side-card-mint">
+                <div class="side-card-text">
+                    <span class="side-tag tag-mint">Special Offer</span>
+                    <h3>Fresh Organic Food</h3>
+                    <a href="#products" onclick="filterProducts('Fruits')" class="btn-side-shop">Shop Now</a>
+                </div>
+                <div class="side-card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400" alt="Fresh Organic Greens">
+                </div>
+            </div>
         </div>
     </div>
-    <div class="hero-image-wrap">
-        <img src="hero_3.png" alt="Fresh grocery shopping" class="hero-img">
+</section>
+
+<!-- "WHAT DO YOU LOOKING FOR" QUICK CATEGORY ICONS -->
+<section class="quick-categories-section" id="quick-categories">
+    <div class="section-title-bar">
+        <h2>What Do You Looking For</h2>
+        <div class="slider-nav-arrows">
+            <button class="nav-arrow" aria-label="Previous Category" onclick="scrollCategories(-150)"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="nav-arrow" aria-label="Next Category" onclick="scrollCategories(150)"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <div class="category-icon-track" id="category-icon-track">
+        <div class="category-icon-item" onclick="filterProducts('Vegetables')">
+            <div class="icon-avatar">
+                <img src="https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=160" alt="Cabbage">
+            </div>
+            <span class="name">Cabbage</span>
+        </div>
+        <div class="category-icon-item" onclick="filterProducts('Vegetables')">
+            <div class="icon-avatar">
+                <img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=160" alt="Eggplant">
+            </div>
+            <span class="name">Eggplant</span>
+        </div>
+        <div class="category-icon-item" onclick="filterProducts('Fruits')">
+            <div class="icon-avatar">
+                <img src="https://images.unsplash.com/photo-1557800636-894a64c1696f?w=160" alt="Orange">
+            </div>
+            <span class="name">Orange</span>
+        </div>
+        <div class="category-icon-item" onclick="filterProducts('Fruits')">
+            <div class="icon-avatar">
+                <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=160" alt="Apple">
+            </div>
+            <span class="name">Apple</span>
+        </div>
+        <div class="category-icon-item" onclick="filterProducts('Vegetables')">
+            <div class="icon-avatar">
+                <img src="https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=160" alt="Broccoli">
+            </div>
+            <span class="name">Broccoli</span>
+        </div>
+        <div class="category-icon-item" onclick="filterProducts('Fruits')">
+            <div class="icon-avatar">
+                <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=160" alt="Banana">
+            </div>
+            <span class="name">Banana</span>
+        </div>
+        <div class="category-icon-item" onclick="filterProducts('Dairy')">
+            <div class="icon-avatar">
+                <img src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=160" alt="Dairy Milk">
+            </div>
+            <span class="name">Dairy Milk</span>
+        </div>
+        <div class="category-icon-item" onclick="filterProducts('Dairy')">
+            <div class="icon-avatar">
+                <img src="https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=160" alt="Eggs">
+            </div>
+            <span class="name">Eggs</span>
+        </div>
+    </div>
+</section>
+
+<!-- 3-COLUMN PROMO DISCOUNT BANNERS -->
+<section class="promo-banners-section" id="promo-banners">
+    <div class="promo-banners-grid">
+        <!-- Promo 1 (Mint) -->
+        <div class="promo-card promo-card-mint">
+            <div class="promo-card-text">
+                <h3>Up to 50% off on Special Item</h3>
+                <p>Shop our selection of organic fresh vegetables in a discounted price. 50% off</p>
+                <a href="#products" onclick="filterProducts('Vegetables')" class="btn-promo-shop">Shop Now</a>
+            </div>
+            <div class="promo-card-visual">
+                <img src="https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=320" alt="Fresh Broccoli">
+            </div>
+        </div>
+
+        <!-- Promo 2 (Soft Blue) -->
+        <div class="promo-card promo-card-blue">
+            <div class="promo-card-text">
+                <h3>Get 10% off on Fruits Item</h3>
+                <p>Shop our selection of organic fresh fruits in a discounted price. 10% off</p>
+                <a href="#products" onclick="filterProducts('Fruits')" class="btn-promo-shop">Shop Now</a>
+            </div>
+            <div class="promo-card-visual">
+                <img src="https://images.unsplash.com/photo-1613478223719-2ab802602423?w=320" alt="Fresh Juice & Fruits">
+            </div>
+        </div>
+
+        <!-- Promo 3 (Peach) -->
+        <div class="promo-card promo-card-peach">
+            <div class="promo-card-text">
+                <h3>Get 75% Organic Vegetable</h3>
+                <p>Shop our selection of organic fresh vegetables in a discounted price. 75% off</p>
+                <a href="#products" onclick="filterProducts('Vegetables')" class="btn-promo-shop">Shop Now</a>
+            </div>
+            <div class="promo-card-visual">
+                <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=320" alt="Fresh Mixed Greens">
+            </div>
+        </div>
     </div>
 </section>
 
@@ -187,79 +376,119 @@
     </div>
 </section>
 
-<!-- PRODUCTS SECTION -->
+<!-- "OUR POPULAR PRODUCTS" SECTION (4x2 Product Grid) -->
 <section class="products-section" id="products">
-
-    <h2><i class="fa-solid fa-store" aria-hidden="true"></i> Our Products</h2>
-
-    <div class="search-wrapper">
-        <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
-        <input
-            type="text"
-            id="search"
-            placeholder="Search for groceries..."
-            aria-label="Search for groceries"
-        >
-    </div>
-
-    <div class="categories">
-        <button onclick="filterProducts('All')"><i class="fa-solid fa-border-all" aria-hidden="true"></i> All</button>
-        <button onclick="filterProducts('Vegetables')"><i class="fa-solid fa-carrot" aria-hidden="true"></i> Vegetables</button>
-        <button onclick="filterProducts('Fruits')"><i class="fa-solid fa-apple-whole" aria-hidden="true"></i> Fruits</button>
-        <button onclick="filterProducts('Dairy')"><i class="fa-solid fa-cow" aria-hidden="true"></i> Dairy</button>
-        <button onclick="filterProducts('Groceries')"><i class="fa-solid fa-wheat-awn" aria-hidden="true"></i> Groceries</button>
+    <div class="popular-products-heading">
+        <h2>Our Popular Products</h2>
+        <div class="categories" id="category-filter-buttons">
+            <button class="active" onclick="filterProducts('All')">All Products</button>
+            <button onclick="filterProducts('Vegetables')">Vegetables</button>
+            <button onclick="filterProducts('Fruits')">Fruits</button>
+            <button onclick="filterProducts('Dairy')">Dairy</button>
+            <button onclick="filterProducts('Groceries')">Groceries</button>
+        </div>
     </div>
 
     <div class="product-container" id="product-container">
-        <!-- Products added using JavaScript -->
+        <!-- Products populated by JavaScript with star ratings, prices, and add to cart buttons -->
     </div>
-
 </section>
 
-<!-- CART SECTION -->
+<!-- "DEALS OF THE WEEKS" SECTION (Countdown + Big Harvest Basket) -->
+<section class="deals-week-section" id="deals-week">
+    <div class="deals-week-container">
+        <!-- Left: Deals info & countdown timer -->
+        <div class="deals-info-col">
+            <h2>Deals Of The Weeks</h2>
+            <p>Hurry up and grab the freshest organic produce at special discount prices before the weekly deal closes!</p>
+            <div class="countdown-grid" id="countdown-timer">
+                <div class="time-box">
+                    <span class="time-num" id="cd-days">364</span>
+                    <span class="time-label">Days</span>
+                </div>
+                <span class="time-sep">:</span>
+                <div class="time-box">
+                    <span class="time-num" id="cd-hours">08</span>
+                    <span class="time-label">Hours</span>
+                </div>
+                <span class="time-sep">:</span>
+                <div class="time-box">
+                    <span class="time-num" id="cd-mins">15</span>
+                    <span class="time-label">Mins</span>
+                </div>
+                <span class="time-sep">:</span>
+                <div class="time-box">
+                    <span class="time-num" id="cd-secs">21</span>
+                    <span class="time-label">Secs</span>
+                </div>
+            </div>
+            <a href="#products" class="btn btn-deals"><i class="fa-solid fa-basket-shopping"></i> Shop Now</a>
+        </div>
+
+        <!-- Right: Vegetable basket with 50% badge -->
+        <div class="deals-visual-col">
+            <div class="discount-badge-circle">
+                <span class="badge-num">50%</span>
+                <span class="badge-text">OFF</span>
+            </div>
+            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=800" alt="Deals of the week harvest basket" class="deals-basket-img">
+        </div>
+    </div>
+</section>
+
+<!-- SHOPPING CART SECTION -->
 <section class="cart-section" id="cart">
-
     <h2><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Shopping Cart</h2>
-
     <div id="cart-items"></div>
-
     <h3>Total: KSh <span id="total">0</span></h3>
-
-    <button class="btn" onclick="checkout()">
+    <button class="btn btn-primary" onclick="checkout()">
         <i class="fa-solid fa-credit-card" aria-hidden="true"></i> Proceed to Checkout
     </button>
-
 </section>
 
 <!-- CHECKOUT MODAL -->
 <div class="modal" id="checkout-modal">
-
     <div class="modal-content">
-
         <span class="close" onclick="closeCheckout()">&times;</span>
-
         <h2><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> Complete Your Order</h2>
-
         <p id="checkout-user"></p>
-
         <input type="text" id="delivery-address" placeholder="Delivery address" required>
-
         <input type="tel" id="delivery-phone" placeholder="Phone number (e.g. 0712345678)" required>
-
         <select id="payment-method">
             <option value="Cash on Delivery">Cash on Delivery</option>
             <option value="M-Pesa">M-Pesa (Demo)</option>
         </select>
-
-        <button class="btn" onclick="placeOrder()"><i class="fa-solid fa-check" aria-hidden="true"></i> Place Order</button>
-
+        <button class="btn btn-primary" onclick="placeOrder()"><i class="fa-solid fa-check" aria-hidden="true"></i> Place Order</button>
     </div>
-
 </div>
 
+<!-- FOOTER -->
 <footer>
-    <p>© <span id="copyright-year"></span> FreshBasket. All Rights Reserved.</p>
-    <p>Fresh choices, easy shopping.</p>
+    <div class="footer-inner">
+        <div class="footer-col">
+            <div class="logo footer-logo">
+                <span class="logo-leaf"><i class="fa-solid fa-leaf"></i></span>
+                <span class="logo-name">Fresh<strong>mat</strong></span>
+            </div>
+            <p>Fresh organic fruits, vegetables, and household essentials directly from the farm.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <a href="#home">Home</a>
+            <a href="#quick-categories">Shop Categories</a>
+            <a href="#products">Popular Products</a>
+            <a href="#deals-week">Deals of the Week</a>
+        </div>
+        <div class="footer-col">
+            <h4>Customer Support</h4>
+            <p><i class="fa-solid fa-phone"></i> 55 0562-256</p>
+            <p><i class="fa-solid fa-envelope"></i> company@gmail.com</p>
+            <p><i class="fa-solid fa-clock"></i> 24/7 Support Center</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© <span id="copyright-year"></span> Freshmat / FreshBasket. All Rights Reserved.</p>
+    </div>
 </footer>
 
 <script src="products.js"></script>
