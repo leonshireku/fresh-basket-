@@ -32,65 +32,6 @@ body {
 
 /* ==========================================================================
    1. TOP ANNOUNCEMENT & CONTACT BAR
-   ========================================================================== */
-
-.top-bar {
-    background: var(--dark);
-    color: #E2E8F0;
-    padding: 8px 6%;
-    font-size: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.top-bar-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    max-width: 1360px;
-    margin: 0 auto;
-}
-
-.top-bar-contact {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.top-bar-contact i {
-    color: var(--primary);
-    margin-right: 4px;
-}
-
-.top-bar-contact .sep {
-    color: rgba(255, 255, 255, 0.25);
-}
-
-.top-bar-right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.top-socials {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.top-socials a {
-    color: #94A3B8;
-    text-decoration: none;
-    font-size: 13px;
-    transition: color 0.2s ease;
-}
-
-.top-socials a:hover {
-    color: var(--primary);
-}
-
 /* ==========================================================================
    2. MAIN NAVIGATION HEADER & GLASS EFFECT
    ========================================================================== */
@@ -1654,15 +1595,6 @@ footer {
 }
 
 @media (max-width: 768px) {
-    .top-bar-inner {
-        justify-content: center;
-        text-align: center;
-    }
-
-    .top-bar-contact {
-        justify-content: center;
-    }
-
     .header-support-pill {
         display: none;
     }
