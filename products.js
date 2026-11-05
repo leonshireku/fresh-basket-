@@ -128,21 +128,35 @@ function initCategoryAutoScroll() {
     if (!track) return;
 
     let currentPos = track.scrollLeft;
-    const speed = 0.85; // Silky smooth speed in pixels per frame
+    let lastTime = null;
+    const speedPerSecond = 24; // Gentle, smooth and slow (24px/sec)
 
-    track.addEventListener("mouseenter", () => { isCategoryTrackPaused = true; });
-    track.addEventListener("mouseleave", () => { isCategoryTrackPaused = false; });
-    track.addEventListener("touchstart", () => { isCategoryTrackPaused = true; }, { passive: true });
-    track.addEventListener("touchend", () => { isCategoryTrackPaused = false; }, { passive: true });
+    const pause = () => { isCategoryTrackPaused = true; };
+    const resume = () => {
+        isCategoryTrackPaused = false;
+        lastTime = performance.now();
+    };
 
-    function autoScrollStep() {
+    track.addEventListener("mouseenter", pause);
+    track.addEventListener("mouseleave", resume);
+    track.addEventListener("touchstart", pause, { passive: true });
+    track.addEventListener("touchend", resume, { passive: true });
+
+    function autoScrollStep(currentTime) {
+        if (!lastTime) lastTime = currentTime;
+        const delta = (currentTime - lastTime) / 1000;
+        lastTime = currentTime;
+
         if (!isCategoryTrackPaused) {
-            currentPos += speed;
-            const halfWidth = track.scrollWidth / 2;
-            if (currentPos >= halfWidth) {
-                currentPos -= halfWidth;
+            // Guard against large time jumps if tab was backgrounded
+            if (delta > 0 && delta < 0.1) {
+                currentPos += speedPerSecond * delta;
+                const halfWidth = track.scrollWidth / 2;
+                if (currentPos >= halfWidth) {
+                    currentPos -= halfWidth;
+                }
+                track.scrollLeft = currentPos;
             }
-            track.scrollLeft = currentPos;
         } else {
             currentPos = track.scrollLeft;
         }
@@ -621,7 +635,7 @@ function initHeroBackgroundSlider() {
     heroSlideInterval = setInterval(() => {
         const nextIndex = (currentHeroSlideIndex + 1) % slides.length;
         setHeroSlide(nextIndex);
-    }, 5000);
+    }, 7000);
 }
 
 // INITIALIZE STORE ON PAGE LOAD
