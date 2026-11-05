@@ -1024,44 +1024,6 @@ nav#main-nav a.nav-link.active {
     margin-bottom: 24px;
 }
 
-.countdown-grid {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 28px;
-}
-
-.time-box {
-    background: #FFFFFF;
-    border: 1px solid #EAD9C6;
-    border-radius: 8px;
-    padding: 8px 14px;
-    min-width: 60px;
-    text-align: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-}
-
-.time-num {
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--primary);
-    display: block;
-    line-height: 1.1;
-}
-
-.time-label {
-    font-size: 10px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    font-weight: 600;
-}
-
-.time-sep {
-    font-size: 18px;
-    font-weight: 700;
-    color: #CBD5E1;
-}
-
 .btn-deals {
     background: var(--primary);
     color: #FFFFFF;
@@ -1632,10 +1594,6 @@ footer {
         max-width: 100%;
     }
 
-    .countdown-grid {
-        justify-content: center;
-    }
-
     .deals-img-wrap {
         width: 100%;
         max-width: 440px;
@@ -1906,31 +1864,6 @@ footer {
         padding: 20px 14px;
         border-radius: 14px;
         gap: 20px;
-    }
-
-    .countdown-grid {
-        gap: 4px;
-        width: 100%;
-    }
-
-    .time-box {
-        min-width: 0;
-        flex: 1 1 0;
-        padding: 6px 4px;
-    }
-
-    .time-num {
-        font-size: 16px;
-    }
-
-    .time-label {
-        font-size: 8px;
-    }
-
-    .time-sep {
-        font-size: 13px;
-        display: flex;
-        align-items: center;
     }
 
     .deal-badge-circle {

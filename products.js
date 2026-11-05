@@ -127,32 +127,6 @@ function scrollCategories(offset) {
     }
 }
 
-// LIVE COUNTDOWN TIMER FOR DEALS OF THE WEEK
-function initCountdown() {
-    let totalSeconds = (364 * 86400) + (8 * 3600) + (15 * 60) + 21;
-    const daysEl = document.getElementById("cd-days");
-    const hoursEl = document.getElementById("cd-hours");
-    const minsEl = document.getElementById("cd-mins");
-    const secsEl = document.getElementById("cd-secs");
-
-    if (!daysEl) return;
-
-    setInterval(() => {
-        if (totalSeconds > 0) {
-            totalSeconds--;
-            const days = Math.floor(totalSeconds / 86400);
-            const hours = Math.floor((totalSeconds % 86400) / 3600);
-            const mins = Math.floor((totalSeconds % 3600) / 60);
-            const secs = totalSeconds % 60;
-
-            daysEl.textContent = days;
-            hoursEl.textContent = hours < 10 ? "0" + hours : hours;
-            minsEl.textContent = mins < 10 ? "0" + mins : mins;
-            secsEl.textContent = secs < 10 ? "0" + secs : secs;
-        }
-    }, 1000);
-}
-
 // ADD TO CART
 function addToCart(id) {
     const product = products.find(item => item.id === id);
@@ -618,7 +592,6 @@ updateAccountLink();
 updateCopyright();
 initScrollHeader();
 initHeroBackgroundSlider();
-initCountdown();
 
 // AUTO-CLOSE MOBILE MENU ON LINK CLICK
 document.querySelectorAll("#main-nav a").forEach(link => {
