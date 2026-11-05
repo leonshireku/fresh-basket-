@@ -119,49 +119,69 @@ function filterProducts(category) {
     }
 }
 
-// SMOOTH AUTO-SCROLLING CATEGORIES TO THE LEFT WITH INFINITE LOOP
+// CONTINUOUS AUTO-SCROLLING CATEGORIES TO THE LEFT (SEAMLESS INFINITE LOOP)
 let categoryScrollAnimFrame = null;
-let isCategoryTrackPaused = false;
+let categoryCurrentPos = 0;
 
 function initCategoryAutoScroll() {
     const track = document.getElementById("category-icon-track");
     if (!track) return;
 
-    let currentPos = track.scrollLeft;
     let lastTime = null;
-    const speedPerSecond = 24; // Gentle, smooth and slow (24px/sec)
-
-    const pause = () => { isCategoryTrackPaused = true; };
-    const resume = () => {
-        isCategoryTrackPaused = false;
-        lastTime = performance.now();
-    };
-
-    track.addEventListener("mouseenter", pause);
-    track.addEventListener("mouseleave", resume);
-    track.addEventListener("touchstart", pause, { passive: true });
-    track.addEventListener("touchend", resume, { passive: true });
+    const speedPerSecond = 26; // pixels per second - smooth, steady, continuous
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartPos = 0;
 
     function autoScrollStep(currentTime) {
         if (!lastTime) lastTime = currentTime;
         const delta = (currentTime - lastTime) / 1000;
         lastTime = currentTime;
 
-        if (!isCategoryTrackPaused) {
-            // Guard against large time jumps if tab was backgrounded
-            if (delta > 0 && delta < 0.1) {
-                currentPos += speedPerSecond * delta;
-                const halfWidth = track.scrollWidth / 2;
-                if (currentPos >= halfWidth) {
-                    currentPos -= halfWidth;
-                }
-                track.scrollLeft = currentPos;
+        const firstGroup = track.querySelector(".category-track-group");
+        const groupWidth = firstGroup ? firstGroup.offsetWidth : 0;
+
+        if (!isDragging && delta > 0 && delta < 0.2 && groupWidth > 0) {
+            categoryCurrentPos += speedPerSecond * delta;
+            if (categoryCurrentPos >= groupWidth) {
+                categoryCurrentPos -= groupWidth;
             }
-        } else {
-            currentPos = track.scrollLeft;
+            track.style.transform = `translate3d(-${categoryCurrentPos.toFixed(2)}px, 0, 0)`;
         }
+
         categoryScrollAnimFrame = requestAnimationFrame(autoScrollStep);
     }
+
+    // Pointer drag / swipe support
+    track.addEventListener("pointerdown", (e) => {
+        if (e.button !== 0) return;
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartPos = categoryCurrentPos;
+    });
+
+    window.addEventListener("pointermove", (e) => {
+        if (!isDragging) return;
+        const firstGroup = track.querySelector(".category-track-group");
+        const groupWidth = firstGroup ? firstGroup.offsetWidth : 0;
+        if (groupWidth <= 0) return;
+
+        const diff = e.clientX - dragStartX;
+        categoryCurrentPos = dragStartPos - diff;
+        while (categoryCurrentPos < 0) categoryCurrentPos += groupWidth;
+        while (categoryCurrentPos >= groupWidth) categoryCurrentPos -= groupWidth;
+        track.style.transform = `translate3d(-${categoryCurrentPos.toFixed(2)}px, 0, 0)`;
+    });
+
+    const endDrag = () => {
+        if (isDragging) {
+            isDragging = false;
+            lastTime = performance.now();
+        }
+    };
+
+    window.addEventListener("pointerup", endDrag);
+    window.addEventListener("pointercancel", endDrag);
 
     if (categoryScrollAnimFrame) cancelAnimationFrame(categoryScrollAnimFrame);
     categoryScrollAnimFrame = requestAnimationFrame(autoScrollStep);
@@ -170,13 +190,15 @@ function initCategoryAutoScroll() {
 // SCROLL CATEGORIES ARROWS
 function scrollCategories(offset) {
     const track = document.getElementById("category-icon-track");
-    if (track) {
-        isCategoryTrackPaused = true;
-        track.scrollBy({ left: offset, behavior: "smooth" });
-        setTimeout(() => {
-            isCategoryTrackPaused = false;
-        }, 800);
-    }
+    if (!track) return;
+    const firstGroup = track.querySelector(".category-track-group");
+    const groupWidth = firstGroup ? firstGroup.offsetWidth : 0;
+    if (groupWidth <= 0) return;
+
+    categoryCurrentPos += offset;
+    while (categoryCurrentPos < 0) categoryCurrentPos += groupWidth;
+    while (categoryCurrentPos >= groupWidth) categoryCurrentPos -= groupWidth;
+    track.style.transform = `translate3d(-${categoryCurrentPos.toFixed(2)}px, 0, 0)`;
 }
 
 // ADD TO CART

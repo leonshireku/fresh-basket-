@@ -145,104 +145,160 @@
 
     <div class="category-track-wrapper">
         <div class="category-icon-track" id="category-icon-track">
-            <!-- Set 1 -->
-            <div class="category-icon-item" onclick="filterProducts('Vegetables')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=160" alt="Cabbage">
+            <!-- Group 1 -->
+            <div class="category-track-group">
+                <div class="category-icon-item" onclick="filterProducts('Vegetables')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=160" alt="Cabbage">
+                    </div>
+                    <span class="name">Cabbage</span>
                 </div>
-                <span class="name">Cabbage</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Vegetables')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=160" alt="Eggplant">
+                <div class="category-icon-item" onclick="filterProducts('Vegetables')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=160" alt="Eggplant">
+                    </div>
+                    <span class="name">Eggplant</span>
                 </div>
-                <span class="name">Eggplant</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Fruits')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1557800636-894a64c1696f?w=160" alt="Orange">
+                <div class="category-icon-item" onclick="filterProducts('Fruits')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1557800636-894a64c1696f?w=160" alt="Orange">
+                    </div>
+                    <span class="name">Orange</span>
                 </div>
-                <span class="name">Orange</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Fruits')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=160" alt="Apple">
+                <div class="category-icon-item" onclick="filterProducts('Fruits')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=160" alt="Apple">
+                    </div>
+                    <span class="name">Apple</span>
                 </div>
-                <span class="name">Apple</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Vegetables')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=160" alt="Broccoli">
+                <div class="category-icon-item" onclick="filterProducts('Vegetables')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=160" alt="Broccoli">
+                    </div>
+                    <span class="name">Broccoli</span>
                 </div>
-                <span class="name">Broccoli</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Fruits')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=160" alt="Banana">
+                <div class="category-icon-item" onclick="filterProducts('Fruits')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=160" alt="Banana">
+                    </div>
+                    <span class="name">Banana</span>
                 </div>
-                <span class="name">Banana</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Dairy')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=160" alt="Dairy Milk">
+                <div class="category-icon-item" onclick="filterProducts('Dairy')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=160" alt="Dairy Milk">
+                    </div>
+                    <span class="name">Dairy Milk</span>
                 </div>
-                <span class="name">Dairy Milk</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Dairy')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=160" alt="Eggs">
+                <div class="category-icon-item" onclick="filterProducts('Dairy')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=160" alt="Eggs">
+                    </div>
+                    <span class="name">Eggs</span>
                 </div>
-                <span class="name">Eggs</span>
             </div>
 
-            <!-- Set 2 (Infinite loop clone) -->
-            <div class="category-icon-item" onclick="filterProducts('Vegetables')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=160" alt="Cabbage">
+            <!-- Group 2 (Continuous loop clone) -->
+            <div class="category-track-group" aria-hidden="true">
+                <div class="category-icon-item" onclick="filterProducts('Vegetables')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=160" alt="Cabbage">
+                    </div>
+                    <span class="name">Cabbage</span>
                 </div>
-                <span class="name">Cabbage</span>
+                <div class="category-icon-item" onclick="filterProducts('Vegetables')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=160" alt="Eggplant">
+                    </div>
+                    <span class="name">Eggplant</span>
+                </div>
+                <div class="category-icon-item" onclick="filterProducts('Fruits')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1557800636-894a64c1696f?w=160" alt="Orange">
+                    </div>
+                    <span class="name">Orange</span>
+                </div>
+                <div class="category-icon-item" onclick="filterProducts('Fruits')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=160" alt="Apple">
+                    </div>
+                    <span class="name">Apple</span>
+                </div>
+                <div class="category-icon-item" onclick="filterProducts('Vegetables')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=160" alt="Broccoli">
+                    </div>
+                    <span class="name">Broccoli</span>
+                </div>
+                <div class="category-icon-item" onclick="filterProducts('Fruits')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=160" alt="Banana">
+                    </div>
+                    <span class="name">Banana</span>
+                </div>
+                <div class="category-icon-item" onclick="filterProducts('Dairy')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=160" alt="Dairy Milk">
+                    </div>
+                    <span class="name">Dairy Milk</span>
+                </div>
+                <div class="category-icon-item" onclick="filterProducts('Dairy')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=160" alt="Eggs">
+                    </div>
+                    <span class="name">Eggs</span>
+                </div>
             </div>
-            <div class="category-icon-item" onclick="filterProducts('Vegetables')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=160" alt="Eggplant">
+
+            <!-- Group 3 (Continuous loop clone for wide viewports) -->
+            <div class="category-track-group" aria-hidden="true">
+                <div class="category-icon-item" onclick="filterProducts('Vegetables')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=160" alt="Cabbage">
+                    </div>
+                    <span class="name">Cabbage</span>
                 </div>
-                <span class="name">Eggplant</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Fruits')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1557800636-894a64c1696f?w=160" alt="Orange">
+                <div class="category-icon-item" onclick="filterProducts('Vegetables')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=160" alt="Eggplant">
+                    </div>
+                    <span class="name">Eggplant</span>
                 </div>
-                <span class="name">Orange</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Fruits')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=160" alt="Apple">
+                <div class="category-icon-item" onclick="filterProducts('Fruits')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1557800636-894a64c1696f?w=160" alt="Orange">
+                    </div>
+                    <span class="name">Orange</span>
                 </div>
-                <span class="name">Apple</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Vegetables')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=160" alt="Broccoli">
+                <div class="category-icon-item" onclick="filterProducts('Fruits')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=160" alt="Apple">
+                    </div>
+                    <span class="name">Apple</span>
                 </div>
-                <span class="name">Broccoli</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Fruits')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=160" alt="Banana">
+                <div class="category-icon-item" onclick="filterProducts('Vegetables')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=160" alt="Broccoli">
+                    </div>
+                    <span class="name">Broccoli</span>
                 </div>
-                <span class="name">Banana</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Dairy')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=160" alt="Dairy Milk">
+                <div class="category-icon-item" onclick="filterProducts('Fruits')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=160" alt="Banana">
+                    </div>
+                    <span class="name">Banana</span>
                 </div>
-                <span class="name">Dairy Milk</span>
-            </div>
-            <div class="category-icon-item" onclick="filterProducts('Dairy')">
-                <div class="icon-avatar">
-                    <img src="https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=160" alt="Eggs">
+                <div class="category-icon-item" onclick="filterProducts('Dairy')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=160" alt="Dairy Milk">
+                    </div>
+                    <span class="name">Dairy Milk</span>
                 </div>
-                <span class="name">Eggs</span>
+                <div class="category-icon-item" onclick="filterProducts('Dairy')">
+                    <div class="icon-avatar">
+                        <img src="https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=160" alt="Eggs">
+                    </div>
+                    <span class="name">Eggs</span>
+                </div>
             </div>
         </div>
     </div>

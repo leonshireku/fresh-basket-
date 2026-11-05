@@ -696,21 +696,23 @@ nav#main-nav a.nav-link.active {
 .category-icon-track {
     display: flex;
     align-items: center;
-    gap: 32px;
-    overflow-x: auto;
-    padding: 10px 4px 16px 4px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    cursor: grab;
+    width: max-content;
+    padding: 10px 0 16px 0;
     user-select: none;
+    will-change: transform;
+    cursor: grab;
 }
 
 .category-icon-track:active {
     cursor: grabbing;
 }
 
-.category-icon-track::-webkit-scrollbar {
-    display: none;
+.category-track-group {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding-right: 32px;
+    flex-shrink: 0;
 }
 
 .category-icon-item {
@@ -1796,15 +1798,16 @@ footer {
     }
 
     .category-icon-track {
-        gap: 12px;
-        padding: 6px 2px 14px 2px;
-        -webkit-overflow-scrolling: touch;
-        scroll-snap-type: x mandatory;
+        padding: 6px 0 14px 0;
+    }
+
+    .category-track-group {
+        gap: 16px;
+        padding-right: 16px;
     }
 
     .category-icon-item {
         flex: 0 0 76px;
-        scroll-snap-align: start;
     }
 
     .icon-avatar {
