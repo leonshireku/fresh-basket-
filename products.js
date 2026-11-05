@@ -40,8 +40,8 @@ function displayProducts(list = products) {
 
     if (!list || list.length === 0) {
         container.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #7B7457;">
-                <i class="fa-solid fa-magnifying-glass" style="font-size: 2rem; color: #854627; margin-bottom: 10px; display:block;"></i>
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748B;">
+                <i class="fa-solid fa-magnifying-glass" style="font-size: 2rem; color: #05A648; margin-bottom: 10px; display:block;"></i>
                 <p>No products found matching your search or filter.</p>
             </div>
         `;
@@ -128,7 +128,7 @@ function displayCart() {
     if (cart.length === 0) {
         container.innerHTML = `
             <div class="empty-cart">
-                <i class="fa-solid fa-basket-shopping" style="font-size: 2.2rem; color: #854627; margin-bottom: 8px; display: block;" aria-hidden="true"></i>
+                <i class="fa-solid fa-basket-shopping" style="font-size: 2.2rem; color: #05A648; margin-bottom: 8px; display: block;" aria-hidden="true"></i>
                 <p>Your shopping cart is currently empty. Explore our fresh products above!</p>
             </div>
         `;
@@ -390,7 +390,7 @@ async function renderAdminDashboard() {
                 <tr>
                     <td><img src="${p.image}" class="table-img" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=500'"></td>
                     <td><strong>${p.name}</strong></td>
-                    <td><span class="badge" style="background:#F1DFCF; color:#854627;">${p.category}</span></td>
+                    <td><span class="badge" style="background:#EBF3E4; color:#05A648;">${p.category}</span></td>
                     <td>KSh ${p.price}</td>
                     <td>
                         <button class="btn-delete-prod" onclick="adminDeleteProduct(${p.id})">
