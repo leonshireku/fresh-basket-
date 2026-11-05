@@ -570,18 +570,45 @@ function initScrollHeader() {
 }
 
 // CONSTANTLY CHANGING HERO BACKGROUND SLIDER
+let heroSlideInterval = null;
+let currentHeroSlideIndex = 0;
+
+function setHeroSlide(index) {
+    const slides = document.querySelectorAll(".hero-bg-slide");
+    const dots = document.querySelectorAll(".hero-carousel-dots .dot");
+    if (!slides || slides.length === 0) return;
+
+    slides.forEach((s, idx) => {
+        if (idx === index) {
+            s.classList.add("active");
+        } else {
+            s.classList.remove("active");
+        }
+    });
+
+    if (dots && dots.length > 0) {
+        dots.forEach((d, idx) => {
+            if (idx === index) {
+                d.classList.add("active");
+            } else {
+                d.classList.remove("active");
+            }
+        });
+    }
+
+    currentHeroSlideIndex = index;
+}
+
 function initHeroBackgroundSlider() {
     const slides = document.querySelectorAll(".hero-bg-slide");
     if (!slides || slides.length < 2) return;
 
-    let currentIndex = 0;
-    const intervalTime = 5000; // Change image every 5 seconds
+    if (heroSlideInterval) clearInterval(heroSlideInterval);
 
-    setInterval(() => {
-        slides[currentIndex].classList.remove("active");
-        currentIndex = (currentIndex + 1) % slides.length;
-        slides[currentIndex].classList.add("active");
-    }, intervalTime);
+    heroSlideInterval = setInterval(() => {
+        const nextIndex = (currentHeroSlideIndex + 1) % slides.length;
+        setHeroSlide(nextIndex);
+    }, 5000);
 }
 
 // INITIALIZE STORE ON PAGE LOAD

@@ -343,7 +343,7 @@ nav#main-nav a.nav-link.active {
 }
 
 /* ==========================================================================
-   4. HERO BENTO GRID SECTION  
+   4. HERO BENTO GRID SECTION (Matching Reference Image)
    ========================================================================== */
 
 .hero-bento-section {
@@ -371,7 +371,44 @@ nav#main-nav a.nav-link.active {
     min-height: 440px;
 }
 
+/* Constantly Changing Background Slider */
+.hero-bg-slider {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.hero-bg-slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transform: scale(1.05);
+    transition: opacity 1.2s ease-in-out, transform 6s ease-out;
+}
+
+.hero-bg-slide.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.hero-bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(235, 243, 228, 0.88) 0%, rgba(235, 243, 228, 0.74) 45%, rgba(235, 243, 228, 0.86) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
 .hero-main-content {
+    position: relative;
     flex: 1.1;
     max-width: 480px;
     z-index: 2;

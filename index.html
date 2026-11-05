@@ -78,6 +78,14 @@
     <div class="hero-bento-grid">
         <!-- Main Hero Card (Left) -->
         <div class="hero-main-card">
+            <!-- Constantly Changing Background Slider -->
+            <div class="hero-bg-slider" id="hero-slider">
+                <div class="hero-bg-slide active" style="background-image: url('hero_2.png');"></div>
+                <div class="hero-bg-slide" style="background-image: url('hero_background.jpg');"></div>
+                <div class="hero-bg-slide" style="background-image: url('hero.jpg');"></div>
+                <div class="hero-bg-overlay"></div>
+            </div>
+
             <div class="hero-main-content">
                 <span class="hero-subtag">Organic 100% Genuine Product</span>
                 <h1>Our <span class="highlight-green">Garden's</span> Most Favorite Food</h1>
@@ -87,9 +95,9 @@
                     <a href="login.html" class="btn btn-outline" id="hero-auth-btn"><i class="fa-solid fa-user"></i> Account & Roles</a>
                 </div>
                 <div class="hero-carousel-dots">
-                    <span class="dot active"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
+                    <span class="dot active" onclick="setHeroSlide(0)"></span>
+                    <span class="dot" onclick="setHeroSlide(1)"></span>
+                    <span class="dot" onclick="setHeroSlide(2)"></span>
                 </div>
             </div>
             <div class="hero-main-visual">
