@@ -97,3 +97,4 @@ module.exports = async (req, res) => {
 
     return sendJson(res, 405, { success: false, message: `Method ${method} Not Allowed` });
 };
+

@@ -193,3 +193,4 @@ module.exports = {
     getOrderVerificationEmailHtml,
     getOrderSuccessEmailHtml
 };
+

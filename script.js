@@ -1395,6 +1395,7 @@ const HERO_SLIDES = [
 let heroSlideInterval = null;
 let currentHeroSlideIndex = 0;
 let heroTypewriterTimer = null;
+let heroCrossFadeTimer = null;
 
 function typeHeroContent(slideData) {
     if (heroTypewriterTimer) clearTimeout(heroTypewriterTimer);
@@ -1440,17 +1441,38 @@ function setHeroSlide(index) {
     const dots = document.querySelectorAll(".hero-carousel-dots .dot");
     if (!slides || slides.length === 0) return;
 
+    const prevIndex = currentHeroSlideIndex;
+    const nextIndex = index % slides.length;
+
+    if (heroCrossFadeTimer) {
+        clearTimeout(heroCrossFadeTimer);
+    }
+
     slides.forEach((s, idx) => {
-        if (idx === index) {
+        if (idx === nextIndex) {
+            s.classList.remove("last-active");
             s.classList.add("active");
+        } else if (idx === prevIndex && prevIndex !== nextIndex) {
+            s.classList.remove("active");
+            s.classList.add("last-active");
         } else {
             s.classList.remove("active");
+            s.classList.remove("last-active");
         }
     });
 
+    // Clean up .last-active once cross-fade has fully completed (1.9s)
+    heroCrossFadeTimer = setTimeout(() => {
+        slides.forEach((s, idx) => {
+            if (idx !== nextIndex) {
+                s.classList.remove("last-active");
+            }
+        });
+    }, 1900);
+
     if (dots && dots.length > 0) {
         dots.forEach((d, idx) => {
-            if (idx === index) {
+            if (idx === nextIndex) {
                 d.classList.add("active");
             } else {
                 d.classList.remove("active");
@@ -1458,8 +1480,8 @@ function setHeroSlide(index) {
         });
     }
 
-    currentHeroSlideIndex = index;
-    typeHeroContent(HERO_SLIDES[index % HERO_SLIDES.length]);
+    currentHeroSlideIndex = nextIndex;
+    typeHeroContent(HERO_SLIDES[nextIndex % HERO_SLIDES.length]);
 }
 
 function initHeroBackgroundSlider() {
