@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "ORD-038995",
+    "order_number": "ORD-038995",
+    "customer": "Test Customer",
+    "email": "test@freshbasket.com",
+    "products": [
+      {
+        "price": 120,
+        "quantity": 2,
+        "name": "Fresh Tomatoes",
+        "id": 1
+      }
+    ],
+    "total": 240,
+    "address": "Kenyatta Avenue, Nairobi",
+    "phone": "0712345678",
+    "payment": "Cash on Delivery",
+    "status": "Delivered",
+    "date": "06/11/2026, 11:33:58"
+  }
+]

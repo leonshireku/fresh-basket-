@@ -42,7 +42,11 @@ function readFallbackData(key, defaultData) {
 function writeFallbackData(key, data) {
     memStorage[key] = data;
     try {
-        const p = path.join(__dirname, '..', 'data', `${key}.json`);
+        const dir = path.join(__dirname, '..', 'data');
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        const p = path.join(dir, `${key}.json`);
         fs.writeFileSync(p, JSON.stringify(data, null, 2));
     } catch (e) {}
 }
@@ -81,7 +85,7 @@ function parseBody(req) {
 
 function sendJson(res, statusCode, data) {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
 

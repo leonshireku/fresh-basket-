@@ -41,6 +41,7 @@ const MIME_TYPES = {
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
     '.jpeg': 'image/jpeg',
+    '.webp': 'image/webp',
     '.svg': 'image/svg+xml',
     '.ico': 'image/x-icon'
 };
@@ -444,208 +445,18 @@ async function handleRequest(req, res) {
     }
 
     // 4. POST /api/auth/login
-    if (pathname === '/api/auth/login' && method === 'POST') {
-        try {
-            const { email, password, role } = await parseBody(req);
-            const cleanEmail = (email || '').trim().toLowerCase();
-
-            try {
-                if (await db.checkConnection()) {
-                    const rows = await db.query(
-                        'SELECT id, name, email, role FROM users WHERE LOWER(email) = ? AND password = ? LIMIT 1',
-                        [cleanEmail, password]
-                    );
-                    if (rows.length > 0) {
-                        const user = rows[0];
-                        sendJson(res, 200, {
-                            success: true,
-                            user: { name: user.name, email: user.email, role: user.role },
-                            message: `Welcome back, ${user.name}!`
-                        });
-                        return;
-                    }
-                }
-            } catch (e) {
-                // fallback
-            }
-
-            const users = readData(USERS_FILE, DEFAULT_USERS);
-            const user = users.find(u => u.email.toLowerCase() === cleanEmail && u.password === password);
-
-            if (!user) {
-                sendJson(res, 401, { success: false, message: 'Invalid email or password.' });
-                return;
-            }
-
-            sendJson(res, 200, {
-                success: true,
-                user: {
-                    name: user.name,
-                    email: user.email,
-                    role: user.role || role || 'client'
-                },
-                message: `Welcome back, ${user.name}!`
-            });
-        } catch (e) {
-            sendJson(res, 400, { success: false, message: e.message });
-        }
-        return;
+    if (pathname === '/api/auth/login') {
+        return await require('./api/auth/login')(req, res);
     }
 
     // 5. POST /api/auth/register
-    if (pathname === '/api/auth/register' && method === 'POST') {
-        try {
-            const { name, email, password, role } = await parseBody(req);
-            const cleanEmail = (email || '').trim().toLowerCase();
-
-            if (!name || !email || !password || password.length < 6) {
-                sendJson(res, 400, { success: false, message: 'Password must be at least 6 characters.' });
-                return;
-            }
-
-            try {
-                if (await db.checkConnection()) {
-                    const existing = await db.query('SELECT id FROM users WHERE LOWER(email) = ?', [cleanEmail]);
-                    if (existing.length > 0) {
-                        sendJson(res, 409, { success: false, message: 'An account with this email already exists.' });
-                        return;
-                    }
-                    const userRole = role === 'admin' ? 'admin' : 'client';
-                    await db.query(
-                        'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-                        [name.trim(), cleanEmail, password, userRole]
-                    );
-                    sendJson(res, 201, {
-                        success: true,
-                        user: { name: name.trim(), email: cleanEmail, role: userRole },
-                        message: 'Account created successfully in database!'
-                    });
-                    return;
-                }
-            } catch (e) {
-                // fallback
-            }
-
-            const users = readData(USERS_FILE, DEFAULT_USERS);
-            if (users.some(u => u.email.toLowerCase() === cleanEmail)) {
-                sendJson(res, 409, { success: false, message: 'An account with this email already exists.' });
-                return;
-            }
-
-            const newUser = {
-                id: Date.now(),
-                name: name.trim(),
-                email: cleanEmail,
-                password,
-                role: role === 'admin' ? 'admin' : 'client'
-            };
-            users.push(newUser);
-            writeData(USERS_FILE, users);
-
-            sendJson(res, 201, {
-                success: true,
-                user: { name: newUser.name, email: newUser.email, role: newUser.role },
-                message: 'Account created successfully!'
-            });
-        } catch (e) {
-            sendJson(res, 400, { success: false, message: e.message });
-        }
-        return;
+    if (pathname === '/api/auth/register') {
+        return await require('./api/auth/register')(req, res);
     }
 
-    // 6. GET /api/orders (Admin)
-    if (pathname === '/api/orders' && method === 'GET') {
-        try {
-            if (await db.checkConnection()) {
-                const rows = await db.query(`
-                    SELECT o.id, o.order_number, o.customer_name AS customer, o.customer_email AS email,
-                           o.delivery_address AS address, o.delivery_phone AS phone, o.payment_method AS payment,
-                           o.total_amount AS total, o.status, o.created_at AS date,
-                           COALESCE(
-                               (SELECT JSON_ARRAYAGG(JSON_OBJECT('name', oi.product_name, 'quantity', oi.quantity, 'price', oi.unit_price))
-                                FROM order_items oi WHERE oi.order_id = o.id),
-                               JSON_ARRAY()
-                           ) AS products
-                    FROM orders o
-                    ORDER BY o.id DESC
-                `);
-                sendJson(res, 200, { success: true, orders: rows });
-                return;
-            }
-        } catch (e) {
-            // fallback
-        }
-        const orders = readData(ORDERS_FILE, []);
-        sendJson(res, 200, { success: true, orders });
-        return;
-    }
-
-    // 7. POST /api/orders (Client)
-    if (pathname === '/api/orders' && method === 'POST') {
-        try {
-            const body = await parseBody(req);
-            const { customer, email, products, total, address, phone, payment } = body;
-
-            if (!customer || !products || !products.length || !address || !phone) {
-                sendJson(res, 400, { success: false, message: 'Missing order details.' });
-                return;
-            }
-
-            const orderNum = "ORD-" + Date.now().toString().slice(-6);
-            const cleanTotal = parseFloat(total) || 0;
-
-            try {
-                if (await db.checkConnection()) {
-                    const result = await db.query(
-                        `INSERT INTO orders (order_number, customer_name, customer_email, delivery_address, delivery_phone, payment_method, total_amount)
-                         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                        [orderNum, customer, email, address, phone, payment || 'Cash on Delivery', cleanTotal]
-                    );
-
-                    const orderId = result.insertId;
-                    for (const item of products) {
-                        await db.query(
-                            `INSERT INTO order_items (order_id, product_id, product_name, unit_price, quantity, subtotal)
-                             VALUES (?, ?, ?, ?, ?, ?)`,
-                            [orderId, item.id || null, item.name, item.price, item.quantity, item.price * item.quantity]
-                        );
-                    }
-
-                    sendJson(res, 201, {
-                        success: true,
-                        order: { id: orderNum, customer, total: cleanTotal },
-                        message: `Order ${orderNum} placed successfully in database!`
-                    });
-                    return;
-                }
-            } catch (e) {
-                // fallback
-            }
-
-            const orders = readData(ORDERS_FILE, []);
-            const newOrder = {
-                id: orderNum,
-                customer,
-                email,
-                products,
-                total: cleanTotal,
-                address,
-                phone,
-                payment: payment || 'Cash on Delivery',
-                date: new Date().toLocaleString()
-            };
-            orders.unshift(newOrder);
-            writeData(ORDERS_FILE, orders);
-
-            sendJson(res, 201, {
-                success: true,
-                order: newOrder,
-                message: `Order ${newOrder.id} placed successfully!`
-            });
-        } catch (e) {
-            sendJson(res, 400, { success: false, message: e.message });
-        }
-        return;
+    // 6 & 7. /api/orders (GET, POST, PUT, PATCH with Resend Email and Previous Records)
+    if (pathname === '/api/orders' || pathname.startsWith('/api/orders/')) {
+        return await require('./api/orders')(req, res);
     }
 
     // 8. GET /api/stats

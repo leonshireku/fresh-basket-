@@ -80,15 +80,15 @@
         <div class="hero-main-card">
             <!-- Constantly Changing Background Slider -->
             <div class="hero-bg-slider" id="hero-slider">
-                <div class="hero-bg-slide active" style="background-image: url('hero_2.png');"></div>
-                <div class="hero-bg-slide" style="background-image: url('hero_background.jpg');"></div>
-                <div class="hero-bg-slide" style="background-image: url('hero.jpg');"></div>
+                <div class="hero-bg-slide active" style="background-image: url('hero_2.webp');"></div>
+                <div class="hero-bg-slide" style="background-image: url('hero_background.webp');"></div>
+                <div class="hero-bg-slide" style="background-image: url('hero.webp');"></div>
                 <div class="hero-bg-overlay"></div>
             </div>
 
             <div class="hero-main-content">
-                <h1>Our <span class="highlight-green">Garden's</span> Most Favorite Food</h1>
-                <p>Fresh organic groceries, vegetables, and household essentials directly from the farm to your door.</p>
+                <h1 id="hero-title">Our <span class="highlight-green">Garden's</span> Most Favorite Food</h1>
+                <p id="hero-subtitle">Fresh organic groceries, vegetables, and household essentials directly from the farm to your door.</p>
                 <div class="hero-cta-group">
                     <a href="#products" class="btn btn-primary"><i class="fa-solid fa-basket-shopping"></i> Shop Now</a>
                     <a href="login.html" class="btn btn-outline" id="hero-auth-btn"><i class="fa-solid fa-user"></i> Account & Roles</a>
@@ -100,7 +100,7 @@
                 </div>
             </div>
             <div class="hero-main-visual">
-                <img src="hero_3.png" alt="Fresh organic vegetables farmer" class="hero-main-img">
+                <img src="hero_3.webp" alt="Fresh organic vegetables farmer" class="hero-main-img" fetchpriority="high">
             </div>
         </div>
 
@@ -438,19 +438,36 @@
         </div>
     </div>
 
-    <!-- ADMIN ORDERS TABLE -->
+    <!-- ADMIN ORDERS & PREVIOUS RECORDS TABLE -->
     <div class="admin-card orders-card">
-        <h3><i class="fa-solid fa-truck-fast"></i> Customer Orders Management</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
+            <div>
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Previous Records & Customer Orders</h3>
+                <p style="color: #64748B; font-size: 13px; margin: 4px 0 0 0;">Track, search, and update fulfillment status for all historical customer orders.</p>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="admin-orders-search" placeholder="Search records by ID, client, email..." oninput="handleAdminOrdersSearch(this.value)" style="padding: 8px 14px; border: 1px solid #E2ECE5; border-radius: 8px; font-size: 13px; min-width: 240px;">
+                <select id="admin-orders-filter-status" onchange="filterAdminOrdersByStatus(this.value)" style="padding: 8px 12px; border: 1px solid #E2ECE5; border-radius: 8px; font-size: 13px; background: #fff;">
+                    <option value="all">All Records</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Dispatched">Dispatched</option>
+                    <option value="Delivered">Delivered</option>
+                </select>
+            </div>
+        </div>
+
         <div class="table-responsive">
             <table class="admin-table">
                 <thead>
                     <tr>
+                        <th>Order #</th>
                         <th>Date & Time</th>
-                        <th>Client Name</th>
-                        <th>Items Ordered</th>
-                        <th>Delivery Address & Phone</th>
-                        <th>Payment</th>
+                        <th>Client Details</th>
+                        <th>Items</th>
                         <th>Total</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="admin-orders-list">
@@ -495,7 +512,7 @@
                 <span class="badge-num">50%</span>
                 <span class="badge-text">OFF</span>
             </div>
-            <img src="grocery_store.jpg" alt="Deals of the week grocery store special" class="deals-basket-img">
+            <img src="grocery_store.webp" alt="Deals of the week grocery store special" class="deals-basket-img" loading="lazy" decoding="async">
         </div>
     </div>
 </section>
@@ -630,7 +647,46 @@
             <option value="Cash on Delivery">Cash on Delivery</option>
             <option value="Online Payment">Card / Digital Payment</option>
         </select>
-        <button class="btn btn-primary" onclick="placeOrder()"><i class="fa-solid fa-check" aria-hidden="true"></i> Place Order</button>
+        <button class="btn btn-primary" onclick="initiateOrderVerification()"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Verify & Place Order</button>
+    </div>
+</div>
+
+<!-- ORDER VERIFICATION CODE MODAL (Resend Email OTP) -->
+<div class="modal" id="order-verify-modal">
+    <div class="modal-content" style="max-width: 440px; text-align: center;">
+        <span class="close" onclick="closeOrderVerifyModal()">&times;</span>
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: #EBF3E4; color: #05A648; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px;">
+            <i class="fa-solid fa-envelope-circle-check"></i>
+        </div>
+        <h2>Verify Your Order</h2>
+        <p style="color: #64748B; font-size: 14px; margin-bottom: 20px;">We sent a 6-digit confirmation code via email to <strong id="verify-email-display" style="color: #123824;"></strong>.</p>
+        
+        <div style="margin: 20px 0;">
+            <input type="text" id="order-otp-code" maxlength="6" placeholder="• • • • • •" style="text-align: center; letter-spacing: 8px; font-size: 28px; font-weight: 800; font-family: monospace; padding: 12px; border: 2px solid #05A648; border-radius: 12px; width: 100%; box-sizing: border-box;" autocomplete="one-time-code">
+            <small id="verify-demo-hint" style="display: block; margin-top: 8px; color: #05A648; font-weight: 600;"></small>
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="confirmOrderWithCode()" style="margin-bottom: 12px;">
+            <i class="fa-solid fa-circle-check"></i> Confirm & Complete Order
+        </button>
+        <button class="btn btn-outline btn-block" onclick="resendVerificationCode()" id="btn-resend-code" style="font-size: 13px;">
+            <i class="fa-solid fa-rotate-right"></i> Resend Verification Code
+        </button>
+    </div>
+</div>
+
+<!-- ADMIN ORDER DETAILS MODAL (Track Previous Records) -->
+<div class="modal" id="admin-order-modal">
+    <div class="modal-content" style="max-width: 620px;">
+        <span class="close" onclick="closeAdminOrderModal()">&times;</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2ECE5; padding-bottom: 14px; margin-bottom: 16px;">
+            <div>
+                <h2 style="margin: 0; font-size: 20px;"><i class="fa-solid fa-file-invoice"></i> Order <span id="modal-order-number"></span></h2>
+                <small id="modal-order-date" style="color: #64748B;"></small>
+            </div>
+            <span id="modal-order-status-badge" class="badge"></span>
+        </div>
+        <div id="modal-order-details-body"></div>
     </div>
 </div>
 

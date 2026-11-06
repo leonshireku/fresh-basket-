@@ -1,5 +1,6 @@
 const db = require('../../db');
 const { DEFAULT_USERS, readFallbackData, writeFallbackData, parseBody, sendJson } = require('../_helper');
+const { sendEmail, getWelcomeEmailHtml } = require('../_email');
 
 module.exports = async (req, res) => {
     if (req.method === 'OPTIONS') {
@@ -23,17 +24,31 @@ module.exports = async (req, res) => {
             return sendJson(res, 400, { success: false, message: 'Password must be at least 6 characters.' });
         }
 
+        const userRole = role === 'admin' ? 'admin' : 'client';
+
         try {
             if (await db.checkConnection()) {
                 const existing = await db.query('SELECT id FROM users WHERE LOWER(email) = ?', [cleanEmail]);
                 if (existing.length > 0) {
                     return sendJson(res, 409, { success: false, message: 'An account with this email already exists.' });
                 }
-                const userRole = role === 'admin' ? 'admin' : 'client';
                 await db.query(
                     'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
                     [name.trim(), cleanEmail, password, userRole]
                 );
+
+                // Send Welcome Email via Resend
+                try {
+                    const welcomeHtml = getWelcomeEmailHtml({ name: name.trim() });
+                    await sendEmail({
+                        to: cleanEmail,
+                        subject: 'Welcome to FreshBasket - 100% Organic Farm Fresh Groceries',
+                        html: welcomeHtml
+                    });
+                } catch (mailErr) {
+                    console.warn('[Welcome Email Notice]', mailErr.message);
+                }
+
                 return sendJson(res, 201, {
                     success: true,
                     user: { name: name.trim(), email: cleanEmail, role: userRole },
@@ -41,7 +56,7 @@ module.exports = async (req, res) => {
                 });
             }
         } catch (e) {
-            // fallback
+            console.error('[DB Register User Error]', e.message);
         }
 
         const users = readFallbackData('users', DEFAULT_USERS);
@@ -54,10 +69,22 @@ module.exports = async (req, res) => {
             name: name.trim(),
             email: cleanEmail,
             password,
-            role: role === 'admin' ? 'admin' : 'client'
+            role: userRole
         };
         users.push(newUser);
         writeFallbackData('users', users);
+
+        // Send Welcome Email via Resend
+        try {
+            const welcomeHtml = getWelcomeEmailHtml({ name: name.trim() });
+            await sendEmail({
+                to: cleanEmail,
+                subject: 'Welcome to FreshBasket - 100% Organic Farm Fresh Groceries',
+                html: welcomeHtml
+            });
+        } catch (mailErr) {
+            console.warn('[Welcome Email Notice]', mailErr.message);
+        }
 
         return sendJson(res, 201, {
             success: true,
