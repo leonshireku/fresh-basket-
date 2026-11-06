@@ -283,7 +283,20 @@ async function handleRequest(req, res) {
         return;
     }
 
-    const urlObj = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    let effectiveUrl = req.url;
+    if (req.headers && req.headers['x-matched-path']) {
+        const matched = req.headers['x-matched-path'].split('?')[0];
+        if (matched && matched.startsWith('/api') && !matched.startsWith('/api/index')) {
+            effectiveUrl = matched;
+        }
+    } else if (req.headers && req.headers['x-forwarded-uri']) {
+        const forwarded = req.headers['x-forwarded-uri'].split('?')[0];
+        if (forwarded && forwarded.startsWith('/api') && !forwarded.startsWith('/api/index')) {
+            effectiveUrl = forwarded;
+        }
+    }
+
+    const urlObj = new URL(effectiveUrl, `http://${req.headers.host || 'localhost'}`);
     const pathname = urlObj.pathname;
     const method = req.method;
 
