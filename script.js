@@ -2,6 +2,46 @@
 let products = [];
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
+let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+// FAVORITES MANAGEMENT
+function saveFavorites() {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    updateWishlistBadges();
+}
+
+function isFavorite(id) {
+    return favorites.includes(Number(id));
+}
+
+function toggleFavorite(id) {
+    id = Number(id);
+    const idx = favorites.indexOf(id);
+    if (idx > -1) {
+        favorites.splice(idx, 1);
+    } else {
+        favorites.push(id);
+    }
+    saveFavorites();
+
+    // Update heart icons across storefront
+    document.querySelectorAll(`.product-fav-btn[data-id="${id}"]`).forEach(btn => {
+        const fav = isFavorite(id);
+        btn.classList.toggle('active', fav);
+        btn.innerHTML = `<i class="${fav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>`;
+        btn.title = fav ? 'Remove from favorites' : 'Add to favorites';
+    });
+
+    displayCart();
+    updateModalFavButton(id);
+    renderWishlistModal();
+}
+
+function updateWishlistBadges() {
+    const count = favorites.length;
+    const badge = document.getElementById("wishlist-count");
+    if (badge) badge.textContent = count;
+}
 
 // FETCH PRODUCTS FROM NODE.JS BACKEND API
 async function fetchProducts() {
@@ -17,6 +57,7 @@ async function fetchProducts() {
         products = JSON.parse(localStorage.getItem("products")) || [];
     }
     displayProducts(products);
+    updateWishlistBadges();
 }
 
 // MOBILE NAVIGATION TOGGLE
@@ -53,9 +94,13 @@ function displayProducts(list = products) {
 
     list.forEach(product => {
         const oldPrice = Math.round(product.price * 1.25);
+        const isFav = isFavorite(product.id);
         container.innerHTML += `
             <div class="product">
-                <div class="product-img-box">
+                <button type="button" class="product-fav-btn ${isFav ? 'active' : ''}" data-id="${product.id}" onclick="event.stopPropagation(); toggleFavorite(${product.id})" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}" aria-label="Favorite">
+                    <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                </button>
+                <div class="product-img-box" onclick="openProductModal(${product.id})" title="Click to view ${product.name} details">
                     <img src="${product.image}" alt="${product.name}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=500'">
                 </div>
                 <div class="product-rating">
@@ -65,11 +110,11 @@ function displayProducts(list = products) {
                     <i class="fa-solid fa-star"></i>
                     <i class="fa-solid fa-star"></i>
                 </div>
-                <h3>${product.name}</h3>
+                <h3 onclick="openProductModal(${product.id})" style="cursor: pointer;" title="Click to view details">${product.name}</h3>
                 <div class="product-cat-label">${product.category}</div>
                 <div class="product-pricing">
-                    <strong>KSh ${product.price}</strong>
-                    <span class="old-price">KSh ${oldPrice}</span>
+                    <strong>KES ${product.price}</strong>
+                    <span class="old-price">KES ${oldPrice}</span>
                 </div>
                 <button class="btn-add-cart" onclick="addToCart(${product.id})">
                     <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Add to Cart
@@ -202,24 +247,27 @@ function scrollCategories(offset) {
 }
 
 // ADD TO CART
-function addToCart(id) {
+function addToCart(id, qty = 1) {
+    id = Number(id);
     const product = products.find(item => item.id === id);
     if (!product) return;
 
     const existing = cart.find(item => item.id === id);
     if (existing) {
-        existing.quantity++;
+        existing.quantity += qty;
     } else {
         cart.push({
             id: product.id,
             name: product.name,
             price: product.price,
-            quantity: 1
+            image: product.image,
+            category: product.category,
+            quantity: qty
         });
     }
 
     saveCart();
-    alert(product.name + " added to cart!");
+    alert(`Added ${qty > 1 ? qty + ' × ' : ''}"${product.name}" to your cart!`);
 }
 
 // SAVE CART
@@ -228,9 +276,23 @@ function saveCart() {
     displayCart();
 }
 
-// DISPLAY CART
+// CLEAR CART
+function clearCart() {
+    if (cart.length === 0) return;
+    if (confirm("Are you sure you want to remove all items from your cart?")) {
+        cart = [];
+        saveCart();
+    }
+}
+
+// DISPLAY CART WITH THUMBNAILS, KES PRICING, AND FAVORITE TOGGLE
 function displayCart() {
     const container = document.getElementById("cart-items");
+    const totalElem = document.getElementById("total");
+    const summarySubtotal = document.getElementById("summary-subtotal");
+    const summaryCount = document.getElementById("cart-summary-count");
+    const clearBtn = document.getElementById("btn-clear-cart");
+
     if (!container) return;
 
     container.innerHTML = "";
@@ -239,41 +301,210 @@ function displayCart() {
     let count = 0;
 
     if (cart.length === 0) {
+        if (clearBtn) clearBtn.style.display = "none";
         container.innerHTML = `
             <div class="empty-cart">
-                <i class="fa-solid fa-basket-shopping" style="font-size: 2.2rem; color: #05A648; margin-bottom: 8px; display: block;" aria-hidden="true"></i>
-                <p>Your shopping cart is currently empty. Explore our fresh products above!</p>
+                <i class="fa-solid fa-basket-shopping" style="font-size: 2.4rem; color: #05A648; margin-bottom: 12px; display: block;" aria-hidden="true"></i>
+                <h4>Your Cart is Empty</h4>
+                <p>You haven't added any fresh groceries to your cart yet. Explore our farm fresh catalog above!</p>
+                <a href="#products" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-leaf"></i> Browse Fresh Products
+                </a>
             </div>
         `;
     } else {
+        if (clearBtn) clearBtn.style.display = "inline-flex";
+
         cart.forEach(item => {
             const subtotal = item.price * item.quantity;
             total += subtotal;
             count += item.quantity;
 
+            // Fallback for image and category
+            const catalogProd = products.find(p => p.id === item.id);
+            const itemImg = item.image || (catalogProd ? catalogProd.image : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=500');
+            const itemCat = item.category || (catalogProd ? catalogProd.category : 'Organic Groceries');
+            const isFav = isFavorite(item.id);
+
             container.innerHTML += `
                 <div class="cart-item">
-                    <span><strong>${item.name}</strong></span>
-                    <span>KSh ${item.price}</span>
-                    <span class="quantity-controls">
-                        <button onclick="changeQuantity(${item.id}, -1)" title="Decrease" aria-label="Decrease quantity"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
-                        <span class="item-qty">${item.quantity}</span>
-                        <button onclick="changeQuantity(${item.id}, 1)" title="Increase" aria-label="Increase quantity"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
-                    </span>
-                    <button class="btn-remove" onclick="removeItem(${item.id})" title="Remove item" aria-label="Remove ${item.name} from cart">
-                        <i class="fa-solid fa-trash-can" aria-hidden="true"></i> Remove
-                    </button>
+                    <div class="cart-item-img-wrap" onclick="openProductModal(${item.id})" title="Click to view ${item.name} details">
+                        <img src="${itemImg}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=500'">
+                        <span class="img-preview-hint"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+                    </div>
+
+                    <div class="cart-item-details">
+                        <h4 class="cart-item-title" onclick="openProductModal(${item.id})" title="Click to view details">${item.name}</h4>
+                        <span class="cart-item-cat">${itemCat}</span>
+                        <div class="cart-item-price-tag">
+                            <span class="unit-price">KES ${item.price}</span>
+                            <span class="price-multiplier">× ${item.quantity} = <strong>KES ${subtotal.toLocaleString()}</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="cart-item-actions">
+                        <button type="button" class="btn-fav-toggle ${isFav ? 'active' : ''}" onclick="toggleFavorite(${item.id})" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}" aria-label="Favorite">
+                            <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+                        </button>
+
+                        <div class="quantity-controls">
+                            <button type="button" onclick="changeQuantity(${item.id}, -1)" title="Decrease" aria-label="Decrease quantity"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+                            <span class="item-qty">${item.quantity}</span>
+                            <button type="button" onclick="changeQuantity(${item.id}, 1)" title="Increase" aria-label="Increase quantity"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+                        </div>
+
+                        <button type="button" class="btn-remove" onclick="removeItem(${item.id})" title="Remove item" aria-label="Remove ${item.name} from cart">
+                            <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
             `;
         });
     }
 
-    const totalEl = document.getElementById("total");
+    if (totalElem) totalElem.textContent = `KES ${total.toLocaleString()}`;
+    if (summarySubtotal) summarySubtotal.textContent = `KES ${total.toLocaleString()}`;
+    if (summaryCount) summaryCount.textContent = count;
+
     const countEl = document.getElementById("cart-count");
     const mobileCountEl = document.getElementById("mobile-cart-count");
-    if (totalEl) totalEl.textContent = total;
     if (countEl) countEl.textContent = count;
     if (mobileCountEl) mobileCountEl.textContent = count;
+}
+
+// PRODUCT DETAIL PREVIEW MODAL (Matching Ref Design Screen 2)
+let currentModalProduct = null;
+let currentModalQty = 1;
+
+function openProductModal(id) {
+    id = Number(id);
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    currentModalProduct = product;
+    currentModalQty = 1;
+
+    const modal = document.getElementById("product-detail-modal");
+    if (!modal) return;
+
+    const imgEl = document.getElementById("modal-product-img");
+    const titleEl = document.getElementById("modal-product-title");
+    const catEl = document.getElementById("modal-product-cat");
+    const priceEl = document.getElementById("modal-product-price");
+    const qtyDisplay = document.getElementById("modal-qty-display");
+    const descEl = document.getElementById("modal-product-desc");
+
+    if (imgEl) imgEl.src = product.image;
+    if (titleEl) titleEl.textContent = product.name;
+    if (catEl) catEl.textContent = product.category;
+    if (priceEl) priceEl.textContent = `KES ${product.price.toLocaleString()}`;
+    if (qtyDisplay) qtyDisplay.textContent = currentModalQty;
+
+    // Organic farm descriptions tailored to category
+    const descriptions = {
+        Vegetables: `Crisp, pesticide-free organic ${product.name.toLowerCase()} harvested fresh daily from certified sustainable local farms. Packed with vital vitamins and natural minerals for healthy living.`,
+        Fruits: `Sun-ripened, juicy organic ${product.name.toLowerCase()} picked at peak sweetness. Naturally rich in dietary fiber and essential antioxidants, delivered fresh to your door.`,
+        Dairy: `Pure, fresh organic ${product.name.toLowerCase()} from pasture-raised farms adhering to the strictest quality, hygiene, and ethical standards.`,
+        Groceries: `Pantry staple ${product.name.toLowerCase()} packaged with care to retain peak nutritional integrity, aroma, and natural taste for your kitchen.`
+    };
+    if (descEl) {
+        descEl.textContent = descriptions[product.category] || `Farm-fresh, 100% natural organic product harvested under sustainable agricultural practices.`;
+    }
+
+    updateModalFavButton(product.id);
+    modal.style.display = "flex";
+}
+
+function closeProductModal() {
+    const modal = document.getElementById("product-detail-modal");
+    if (modal) modal.style.display = "none";
+}
+
+function adjustModalQty(delta) {
+    currentModalQty = Math.max(1, currentModalQty + delta);
+    const display = document.getElementById("modal-qty-display");
+    if (display) display.textContent = currentModalQty;
+
+    if (currentModalProduct) {
+        const total = currentModalProduct.price * currentModalQty;
+        const priceEl = document.getElementById("modal-product-price");
+        if (priceEl) priceEl.textContent = `KES ${total.toLocaleString()}`;
+    }
+}
+
+function toggleCurrentModalFavorite() {
+    if (!currentModalProduct) return;
+    toggleFavorite(currentModalProduct.id);
+}
+
+function updateModalFavButton(id) {
+    if (!currentModalProduct || currentModalProduct.id !== id) return;
+    const isFav = isFavorite(id);
+    const favIconBtn = document.getElementById("modal-product-fav-btn");
+    const favPillBtn = document.getElementById("modal-fav-toggle-btn");
+
+    if (favIconBtn) {
+        favIconBtn.classList.toggle("active", isFav);
+        favIconBtn.innerHTML = `<i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>`;
+        favIconBtn.title = isFav ? "Remove from favorites" : "Add to favorites";
+    }
+    if (favPillBtn) {
+        favPillBtn.classList.toggle("active", isFav);
+        favPillBtn.innerHTML = `<i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i> ${isFav ? 'Favorited' : 'Favorite'}`;
+    }
+}
+
+function addModalProductToCart() {
+    if (!currentModalProduct) return;
+    addToCart(currentModalProduct.id, currentModalQty);
+    closeProductModal();
+}
+
+// WISHLIST / FAVORITES MODAL
+function openWishlistModal(event) {
+    if (event) event.preventDefault();
+    const modal = document.getElementById("wishlist-modal");
+    if (!modal) return;
+    renderWishlistModal();
+    modal.style.display = "flex";
+}
+
+function closeWishlistModal() {
+    const modal = document.getElementById("wishlist-modal");
+    if (modal) modal.style.display = "none";
+}
+
+function renderWishlistModal() {
+    const container = document.getElementById("wishlist-items-container");
+    if (!container) return;
+
+    const favProducts = products.filter(p => isFavorite(p.id));
+    if (favProducts.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px 15px; color: #64748B;">
+                <i class="fa-regular fa-heart" style="font-size: 2.4rem; color: #CBD5E1; margin-bottom: 12px; display: block;"></i>
+                <h4 style="font-family: var(--font-display); font-size: 18px; color: var(--dark); margin-bottom: 6px;">No Favorites Yet</h4>
+                <p style="font-size: 13.5px; line-height: 1.5;">Click the heart icon on any grocery item to save it to your personal wishlist!</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = favProducts.map(p => `
+        <div class="wishlist-item">
+            <img src="${p.image}" alt="${p.name}" onclick="closeWishlistModal(); openProductModal(${p.id});" style="cursor: pointer;" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=500'">
+            <div class="wishlist-item-info">
+                <h4 onclick="closeWishlistModal(); openProductModal(${p.id});" style="cursor: pointer;">${p.name}</h4>
+                <span class="price">KES ${p.price}</span>
+            </div>
+            <button class="btn-wishlist-add-cart" onclick="addToCart(${p.id}); closeWishlistModal();">
+                <i class="fa-solid fa-cart-shopping"></i> Add
+            </button>
+            <button class="btn-wishlist-remove" onclick="toggleFavorite(${p.id})" title="Remove from favorites" aria-label="Remove">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    `).join("");
 }
 
 // CHANGE QUANTITY
@@ -486,7 +717,7 @@ async function renderAdminDashboard() {
                             <td>${itemsList}</td>
                             <td>${o.address}<br><small>${o.phone}</small></td>
                             <td><span class="badge" style="background:#dbeafe; color:#1e40af;">${o.payment}</span></td>
-                            <td><strong>KSh ${o.total}</strong></td>
+                            <td><strong>KES ${o.total.toLocaleString()}</strong></td>
                         </tr>
                     `;
                 });
@@ -505,7 +736,7 @@ async function renderAdminDashboard() {
                     <td><img src="${p.image}" class="table-img" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=500'"></td>
                     <td><strong>${p.name}</strong></td>
                     <td><span class="badge" style="background:#EBF3E4; color:#05A648;">${p.category}</span></td>
-                    <td>KSh ${p.price}</td>
+                    <td>KES ${p.price.toLocaleString()}</td>
                     <td>
                         <button class="btn-delete-prod" onclick="adminDeleteProduct(${p.id})">
                             <i class="fa-solid fa-trash"></i> Delete

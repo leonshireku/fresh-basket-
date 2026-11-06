@@ -34,10 +34,10 @@
         <!-- Right Actions -->
         <div class="header-right-group">
             <div class="header-action-icons">
-                <a href="#products" class="action-btn-circle" title="Wishlist" aria-label="Wishlist">
+                <button type="button" class="action-btn-circle" id="wishlist-btn" onclick="openWishlistModal()" title="Favorites & Wishlist" aria-label="Favorites & Wishlist">
                     <i class="fa-regular fa-heart"></i>
-                    <span class="badge-count">0</span>
-                </a>
+                    <span class="badge-count" id="wishlist-count">0</span>
+                </button>
                 <a href="#cart" class="action-btn-circle" id="mobile-cart-btn" title="Cart" aria-label="Shopping Cart">
                     <i class="fa-solid fa-cart-shopping"></i>
                     <span class="badge-count" id="mobile-cart-count">0</span>
@@ -375,7 +375,7 @@
             <div class="stat-icon icon-revenue"><i class="fa-solid fa-money-bill-trend-up"></i></div>
             <div class="stat-info">
                 <span class="stat-label">Total Sales Revenue</span>
-                <h3>KSh <span id="stat-revenue-total">0</span></h3>
+                <h3>KES <span id="stat-revenue-total">0</span></h3>
             </div>
         </div>
     </div>
@@ -401,7 +401,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="prod-price">Price (KSh)</label>
+                    <label for="prod-price">Price (KES)</label>
                     <input type="number" id="prod-price" min="1" placeholder="e.g. 150" required>
                 </div>
 
@@ -500,15 +500,123 @@
     </div>
 </section>
 
-<!-- SHOPPING CART SECTION -->
+<!-- SHOPPING CART SECTION (App-inspired layout with item thumbnails, KES pricing & favorites) -->
 <section class="cart-section" id="cart">
-    <h2><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Shopping Cart</h2>
-    <div id="cart-items"></div>
-    <h3>Total: KSh <span id="total">0</span></h3>
-    <button class="btn btn-primary" onclick="checkout()">
-        <i class="fa-solid fa-credit-card" aria-hidden="true"></i> Proceed to Checkout
-    </button>
+    <div class="cart-header-row">
+        <div>
+            <h2><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Shopping Cart</h2>
+            <p class="cart-subheading">Fresh organic groceries selected for your delivery.</p>
+        </div>
+        <button class="btn-clear-cart" onclick="clearCart()" id="btn-clear-cart" title="Clear all items in cart">
+            <i class="fa-solid fa-trash-can"></i> Clear Cart
+        </button>
+    </div>
+
+    <div class="cart-grid-wrapper">
+        <!-- Left: Cart Items List -->
+        <div class="cart-items-list" id="cart-items"></div>
+
+        <!-- Right: Order Summary Card -->
+        <div class="cart-summary-card" id="cart-summary-card">
+            <h3>Order Summary</h3>
+            <div class="summary-line">
+                <span>Items Subtotal (<span id="cart-summary-count">0</span> items)</span>
+                <span id="summary-subtotal">KES 0</span>
+            </div>
+            <div class="summary-line">
+                <span>Delivery Fee</span>
+                <span class="delivery-free">FREE</span>
+            </div>
+            <hr class="summary-divider">
+            <div class="summary-line total-line">
+                <strong>Total Amount</strong>
+                <strong class="total-price" id="total">KES 0</strong>
+            </div>
+            <button class="btn btn-primary btn-checkout-action" onclick="checkout()">
+                <i class="fa-solid fa-credit-card" aria-hidden="true"></i> Proceed to Checkout
+            </button>
+            <div class="cart-secure-notice">
+                <i class="fa-solid fa-shield-halved"></i> 100% Organic Farm Quality • Pay with M-Pesa or Cash on Delivery
+            </div>
+        </div>
+    </div>
 </section>
+
+<!-- PRODUCT DETAIL PREVIEW MODAL (App-style preview matching design) -->
+<div class="modal" id="product-detail-modal">
+    <div class="modal-content product-detail-modal-content">
+        <button type="button" class="modal-back-btn" onclick="closeProductModal()" aria-label="Back">
+            <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+        </button>
+        <span class="close modal-close-corner" onclick="closeProductModal()">&times;</span>
+
+        <div class="product-detail-layout">
+            <!-- Big Hero Image -->
+            <div class="product-detail-visual">
+                <img id="modal-product-img" src="" alt="Product Detail">
+                <button type="button" class="modal-fav-btn" id="modal-product-fav-btn" onclick="toggleCurrentModalFavorite()" title="Add to favorites" aria-label="Favorite">
+                    <i class="fa-regular fa-heart"></i>
+                </button>
+            </div>
+
+            <!-- Detail Info -->
+            <div class="product-detail-info">
+                <span class="product-detail-badge" id="modal-product-cat">Vegetables</span>
+                <h2 id="modal-product-title">Product Name</h2>
+                <div class="product-detail-meta">
+                    <div class="product-rating">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <span class="rating-num">5.0 (Fresh Grade)</span>
+                    </div>
+                    <span class="stock-badge"><i class="fa-solid fa-circle-check"></i> In Stock</span>
+                </div>
+
+                <!-- Price & Quantity Bar -->
+                <div class="product-detail-action-bar">
+                    <div class="modal-qty-selector">
+                        <button type="button" onclick="adjustModalQty(-1)" aria-label="Decrease quantity"><i class="fa-solid fa-minus"></i></button>
+                        <span id="modal-qty-display">1</span>
+                        <button type="button" onclick="adjustModalQty(1)" aria-label="Increase quantity"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div class="modal-pricing">
+                        <span class="modal-price-label">Price:</span>
+                        <strong id="modal-product-price">KES 0</strong>
+                    </div>
+                </div>
+
+                <!-- About the product -->
+                <div class="product-detail-about">
+                    <h4>About the product</h4>
+                    <p id="modal-product-desc">100% freshly harvested organic produce directly from certified local farms. Packed with nutrients and flavor, delivered fresh to your doorstep.</p>
+                </div>
+
+                <!-- Bottom CTA Buttons -->
+                <div class="modal-bottom-cta">
+                    <button type="button" class="btn btn-outline modal-fav-pill" id="modal-fav-toggle-btn" onclick="toggleCurrentModalFavorite()">
+                        <i class="fa-regular fa-heart"></i> Favorite
+                    </button>
+                    <button type="button" class="btn btn-primary modal-add-cart-btn" onclick="addModalProductToCart()">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- WISHLIST / FAVORITES MODAL -->
+<div class="modal" id="wishlist-modal">
+    <div class="modal-content wishlist-modal-content">
+        <span class="close" onclick="closeWishlistModal()">&times;</span>
+        <h2><i class="fa-solid fa-heart" style="color: #E11D48;"></i> Your Favorites & Wishlist</h2>
+        <p class="wishlist-sub">Your hand-picked favorite farm fresh groceries.</p>
+        <div id="wishlist-items-container" class="wishlist-items-container"></div>
+    </div>
+</div>
 
 <!-- CHECKOUT MODAL -->
 <div class="modal" id="checkout-modal">
@@ -519,8 +627,8 @@
         <input type="text" id="delivery-address" placeholder="Delivery address" required>
         <input type="tel" id="delivery-phone" placeholder="Phone number (e.g. 0712345678)" required>
         <select id="payment-method">
+            <option value="M-Pesa">M-Pesa (Instant Mobile Money)</option>
             <option value="Cash on Delivery">Cash on Delivery</option>
-            <option value="M-Pesa">M-Pesa (Demo)</option>
         </select>
         <button class="btn btn-primary" onclick="placeOrder()"><i class="fa-solid fa-check" aria-hidden="true"></i> Place Order</button>
     </div>
