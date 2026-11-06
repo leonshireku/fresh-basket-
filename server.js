@@ -157,8 +157,18 @@ function writeData(filePath, data) {
     }
 }
 
-// REQUEST BODY PARSER
+// REQUEST BODY PARSER (Supports both raw Node streams and pre-parsed Serverless bodies)
 function parseBody(req) {
+    if (req.body && typeof req.body === 'object') {
+        return Promise.resolve(req.body);
+    }
+    if (typeof req.body === 'string' && req.body.length > 0) {
+        try {
+            return Promise.resolve(JSON.parse(req.body));
+        } catch (e) {
+            return Promise.reject(new Error('Invalid JSON'));
+        }
+    }
     return new Promise((resolve, reject) => {
         let body = '';
         req.on('data', chunk => {
@@ -221,8 +231,8 @@ function serveStaticFile(req, res, pathname) {
     });
 }
 
-// MAIN HTTP SERVER
-const server = http.createServer(async (req, res) => {
+// MAIN HTTP REQUEST HANDLER (Dual-mode: Standalone Server + Vercel Serverless Function)
+async function handleRequest(req, res) {
     if (req.method === 'OPTIONS') {
         res.writeHead(204, {
             'Access-Control-Allow-Origin': '*',
@@ -587,22 +597,32 @@ const server = http.createServer(async (req, res) => {
 
     // STATIC FILES
     serveStaticFile(req, res, pathname);
-});
+}
 
-server.listen(PORT, async () => {
-    console.log(`===============================================`);
-    console.log(`🥬 FreshBasket Server running on http://localhost:${PORT}`);
-    console.log(`⚙️ Loaded configuration from .env:`);
-    console.log(`   - DB_HOST: ${process.env.DB_HOST || 'localhost'}`);
-    console.log(`   - DB_PORT: ${process.env.DB_PORT || '3306'}`);
-    console.log(`   - DB_USER: ${process.env.DB_USER || 'root'}`);
-    console.log(`   - DB_NAME: ${process.env.DB_NAME || 'freshbasket'}`);
+// CREATE HTTP SERVER INSTANCE
+const server = http.createServer(handleRequest);
 
-    const hasMySQL = await db.checkConnection();
-    if (hasMySQL) {
-        console.log(`🐬 MySQL Connected! Live SQL queries active.`);
-    } else {
-        console.log(`📁 File Database Ready. Connect MySQL anytime via .env.`);
-    }
-    console.log(`===============================================`);
-});
+// Only listen on port if running as standalone process (not serverless on Vercel)
+if (require.main === module && !process.env.VERCEL) {
+    server.listen(PORT, async () => {
+        console.log(`===============================================`);
+        console.log(`🥬 FreshBasket Server running on http://localhost:${PORT}`);
+        console.log(`⚙️ Loaded configuration from .env:`);
+        console.log(`   - DB_HOST: ${process.env.DB_HOST || 'localhost'}`);
+        console.log(`   - DB_PORT: ${process.env.DB_PORT || '3306'}`);
+        console.log(`   - DB_USER: ${process.env.DB_USER || 'root'}`);
+        console.log(`   - DB_NAME: ${process.env.DB_NAME || 'freshbasket'}`);
+
+        const hasMySQL = await db.checkConnection();
+        if (hasMySQL) {
+            console.log(`🐬 MySQL Connected! Live SQL queries active.`);
+        } else {
+            console.log(`📁 File Database Ready. Connect MySQL anytime via .env.`);
+        }
+        console.log(`===============================================`);
+    });
+}
+
+module.exports = handleRequest;
+module.exports.server = server;
+module.exports.handleRequest = handleRequest;

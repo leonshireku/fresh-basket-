@@ -51,7 +51,7 @@ function initPool() {
             try { pool.end(); } catch (e) {}
         }
 
-        pool = mysql.createPool({
+        const poolConfig = {
             host: process.env.DB_HOST || 'localhost',
             port: parseInt(process.env.DB_PORT || '3306', 10),
             user: process.env.DB_USER || 'root',
@@ -60,7 +60,15 @@ function initPool() {
             waitForConnections: true,
             connectionLimit: 10,
             queueLimit: 0
-        });
+        };
+
+        const hostStr = (process.env.DB_HOST || '').toLowerCase();
+        const isRemoteHost = hostStr && hostStr !== 'localhost' && hostStr !== '127.0.0.1';
+        if (process.env.DB_SSL === 'true' || isRemoteHost) {
+            poolConfig.ssl = { minVersion: 'TLSv1.2', rejectUnauthorized: false };
+        }
+
+        pool = mysql.createPool(poolConfig);
         lastConfigHash = currentHash;
         return pool;
     } catch (e) {
@@ -80,13 +88,19 @@ async function autoInitDatabase() {
         const password = process.env.DB_PASSWORD || '';
         const dbName = process.env.DB_NAME || 'freshbasket';
 
-        // Connect directly to MySQL server without database specified
-        const conn = await mysql.createConnection({
+        const connConfig = {
             host,
             port,
             user,
             password
-        });
+        };
+        const hostStr = host.toLowerCase();
+        if (process.env.DB_SSL === 'true' || (hostStr && hostStr !== 'localhost' && hostStr !== '127.0.0.1')) {
+            connConfig.ssl = { minVersion: 'TLSv1.2', rejectUnauthorized: false };
+        }
+
+        // Connect directly to MySQL server without database specified
+        const conn = await mysql.createConnection(connConfig);
 
         // Create database if not exists
         await conn.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
