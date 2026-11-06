@@ -626,13 +626,18 @@ function removeFromCart(id) {
 
 // UPDATE CART COUNT BADGE
 function updateCartCount() {
-    const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const totalCount = cart.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
     const countElems = [
         document.getElementById("cart-count"),
-        document.getElementById("nav-cart-count")
+        document.getElementById("mobile-cart-count"),
+        document.getElementById("nav-cart-count"),
+        document.getElementById("cart-summary-count")
     ];
     countElems.forEach(elem => {
         if (elem) elem.textContent = totalCount;
+    });
+    document.querySelectorAll(".cart-count-badge, [data-cart-count]").forEach(elem => {
+        elem.textContent = totalCount;
     });
 }
 
