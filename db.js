@@ -29,14 +29,104 @@ let pool = null;
 let isConnected = false;
 let lastConfigHash = '';
 
+// Flexible configuration extractor: accepts TiDB Cloud, standard MySQL, or connection strings
+function getDatabaseConfig() {
+    loadEnv();
+
+    // 1. Connection string support (DATABASE_URL / TIDB_URL / MYSQL_URL)
+    const connUrl = process.env.DATABASE_URL || process.env.TIDB_URL || process.env.MYSQL_URL;
+    if (connUrl) {
+        try {
+            const parsed = new URL(connUrl);
+            const isRemote = parsed.hostname !== 'localhost' && parsed.hostname !== '127.0.0.1';
+            return {
+                host: parsed.hostname,
+                port: parseInt(parsed.port || (parsed.hostname.includes('tidbcloud') ? '4000' : '3306'), 10),
+                user: decodeURIComponent(parsed.username || 'root'),
+                password: decodeURIComponent(parsed.password || ''),
+                database: (parsed.pathname || '').replace(/^\//, '') || 'freshbasket',
+                ssl: isRemote ? { minVersion: 'TLSv1.2', rejectUnauthorized: false } : undefined
+            };
+        } catch (e) {
+            console.warn('[Database] Could not parse DATABASE_URL, checking individual env variables...');
+        }
+    }
+
+    // 2. Individual Environment Variables (accepts both TIDB_* and DB_* / exact TiDB modal labels)
+    let host = 'localhost';
+    if (process.env.TIDB_HOST) {
+        host = process.env.TIDB_HOST;
+    } else if (process.env.DB_HOST && process.env.DB_HOST !== 'localhost' && process.env.DB_HOST !== '127.0.0.1') {
+        host = process.env.DB_HOST;
+    } else if (process.env.HOST && process.env.HOST !== '0.0.0.0' && process.env.HOST !== 'localhost') {
+        host = process.env.HOST;
+    } else if (process.env.DB_HOST) {
+        host = process.env.DB_HOST;
+    }
+
+    const isRemote = host !== 'localhost' && host !== '127.0.0.1';
+    const isTiDB = host.toLowerCase().includes('tidbcloud');
+
+    let portRaw = process.env.TIDB_PORT;
+    if (!portRaw && isTiDB) {
+        portRaw = (process.env.DB_PORT && process.env.DB_PORT !== '3306') ? process.env.DB_PORT : (process.env.PORT && process.env.PORT !== '3000' ? process.env.PORT : '4000');
+    }
+    if (!portRaw) {
+        portRaw = process.env.DB_PORT || process.env.MYSQL_PORT || (isTiDB ? '4000' : '3306');
+    }
+    const port = parseInt(portRaw, 10);
+
+    let user = 'root';
+    if (process.env.TIDB_USER) {
+        user = process.env.TIDB_USER;
+    } else if (process.env.TIDB_USERNAME) {
+        user = process.env.TIDB_USERNAME;
+    } else if (process.env.DB_USER && process.env.DB_USER !== 'root') {
+        user = process.env.DB_USER;
+    } else if (process.env.DB_USERNAME) {
+        user = process.env.DB_USERNAME;
+    } else if (process.env.USERNAME && process.env.USERNAME !== 'root' && !process.env.USERNAME.includes('\\') && process.env.USERNAME !== 'Administrator') {
+        user = process.env.USERNAME;
+    } else if (process.env.DB_USER) {
+        user = process.env.DB_USER;
+    }
+
+    const password = process.env.TIDB_PASSWORD || 
+                     process.env.DB_PASSWORD || 
+                     process.env.MYSQL_PASSWORD || 
+                     process.env.PASSWORD || 
+                     '';
+
+    const database = process.env.TIDB_DATABASE || 
+                     process.env.TIDB_DB_NAME || 
+                     process.env.DB_DATABASE || 
+                     process.env.DATABASE || 
+                     process.env.DB_NAME || 
+                     process.env.MYSQL_DATABASE || 
+                     'freshbasket';
+
+    const enableSsl = process.env.TIDB_ENABLE_SSL === 'true' || 
+                      process.env.DB_SSL === 'true' || 
+                      process.env.MYSQL_SSL === 'true' || 
+                      isRemote; 
+                      process.env.MYSQL_SSL === 'true' || 
+                      isRemote;
+
+    const ssl = enableSsl ? { minVersion: 'TLSv1.2', rejectUnauthorized: false } : undefined;
+
+    return {
+        host,
+        port,
+        user,
+        password,
+        database,
+        ssl
+    };
+}
+
 function getConfigHash() {
-    return [
-        process.env.DB_HOST || 'localhost',
-        process.env.DB_PORT || '3306',
-        process.env.DB_USER || 'root',
-        process.env.DB_PASSWORD || '',
-        process.env.DB_NAME || 'freshbasket'
-    ].join('::');
+    const cfg = getDatabaseConfig();
+    return [cfg.host, cfg.port, cfg.user, cfg.password, cfg.database, cfg.ssl ? 'ssl' : 'plain'].join('::');
 }
 
 function initPool() {
@@ -51,21 +141,20 @@ function initPool() {
             try { pool.end(); } catch (e) {}
         }
 
+        const cfg = getDatabaseConfig();
         const poolConfig = {
-            host: process.env.DB_HOST || 'localhost',
-            port: parseInt(process.env.DB_PORT || '3306', 10),
-            user: process.env.DB_USER || 'root',
-            password: process.env.DB_PASSWORD || '',
-            database: process.env.DB_NAME || 'freshbasket',
+            host: cfg.host,
+            port: cfg.port,
+            user: cfg.user,
+            password: cfg.password,
+            database: cfg.database,
             waitForConnections: true,
             connectionLimit: 10,
             queueLimit: 0
         };
 
-        const hostStr = (process.env.DB_HOST || '').toLowerCase();
-        const isRemoteHost = hostStr && hostStr !== 'localhost' && hostStr !== '127.0.0.1';
-        if (process.env.DB_SSL === 'true' || isRemoteHost) {
-            poolConfig.ssl = { minVersion: 'TLSv1.2', rejectUnauthorized: false };
+        if (cfg.ssl) {
+            poolConfig.ssl = cfg.ssl;
         }
 
         pool = mysql.createPool(poolConfig);
@@ -82,34 +171,29 @@ initPool();
 async function autoInitDatabase() {
     try {
         const mysql = require('mysql2/promise');
-        const host = process.env.DB_HOST || 'localhost';
-        const port = parseInt(process.env.DB_PORT || '3306', 10);
-        const user = process.env.DB_USER || 'root';
-        const password = process.env.DB_PASSWORD || '';
-        const dbName = process.env.DB_NAME || 'freshbasket';
+        const cfg = getDatabaseConfig();
 
         const connConfig = {
-            host,
-            port,
-            user,
-            password
+            host: cfg.host,
+            port: cfg.port,
+            user: cfg.user,
+            password: cfg.password
         };
-        const hostStr = host.toLowerCase();
-        if (process.env.DB_SSL === 'true' || (hostStr && hostStr !== 'localhost' && hostStr !== '127.0.0.1')) {
-            connConfig.ssl = { minVersion: 'TLSv1.2', rejectUnauthorized: false };
+        if (cfg.ssl) {
+            connConfig.ssl = cfg.ssl;
         }
 
         // Connect directly to MySQL server without database specified
         const conn = await mysql.createConnection(connConfig);
 
         // Create database if not exists
-        await conn.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
-        await conn.query(`USE \`${dbName}\``);
+        await conn.query(`CREATE DATABASE IF NOT EXISTS \`${cfg.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+        await conn.query(`USE \`${cfg.database}\``);
 
         // Check if tables already exist
         const [tables] = await conn.query("SHOW TABLES LIKE 'products'");
         if (tables.length === 0) {
-            console.log(`[Database] Auto-initializing schema for '${dbName}' from database.sql...`);
+            console.log(`[Database] Auto-initializing schema for '${cfg.database}' from database.sql...`);
             const sqlPath = path.join(__dirname, 'database.sql');
             if (fs.existsSync(sqlPath)) {
                 const sqlScript = fs.readFileSync(sqlPath, 'utf8');
@@ -125,7 +209,7 @@ async function autoInitDatabase() {
                         // Continue on non-fatal statement warnings
                     }
                 }
-                console.log(`[Database] Database '${dbName}' successfully created and tables seeded.`);
+                console.log(`[Database] Database '${cfg.database}' successfully created and tables seeded.`);
             }
         }
         await conn.end();
@@ -184,6 +268,7 @@ async function query(sql, params = []) {
 module.exports = {
     get pool() { return pool; },
     get isConnected() { return isConnected; },
+    getDatabaseConfig,
     loadEnv,
     checkConnection,
     query

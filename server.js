@@ -292,15 +292,18 @@ async function handleRequest(req, res) {
     // 0. GET /api/db-status
     if (pathname === '/api/db-status' && method === 'GET') {
         const isConn = await db.checkConnection();
+        const cfg = db.getDatabaseConfig ? db.getDatabaseConfig() : {};
+        const isTiDB = cfg.host && cfg.host.toLowerCase().includes('tidbcloud');
         sendJson(res, 200, {
             success: true,
             databaseConnected: isConn,
-            type: isConn ? 'MySQL / MariaDB' : 'JSON Storage (Fallback)',
+            type: isConn ? (isTiDB ? 'TiDB Cloud (Serverless)' : 'MySQL / MariaDB') : 'JSON Storage (Fallback)',
             config: {
-                host: process.env.DB_HOST || 'localhost',
-                port: process.env.DB_PORT || '3306',
-                user: process.env.DB_USER || 'root',
-                database: process.env.DB_NAME || 'freshbasket'
+                host: cfg.host || 'localhost',
+                port: cfg.port || 3306,
+                user: cfg.user || 'root',
+                database: cfg.database || 'freshbasket',
+                ssl: !!cfg.ssl
             }
         });
         return;
