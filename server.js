@@ -243,12 +243,30 @@ function sendJson(res, statusCode, data) {
 
 // STATIC FILE HANDLER
 function serveStaticFile(req, res, pathname) {
-    let safePath = pathname === '/' ? '/index.html' : pathname;
-    const filePath = path.join(__dirname, decodeURI(safePath));
+    let safePath = (pathname === '/' || pathname === '' || pathname === '/index') ? '/index.html' : pathname;
+    const decoded = decodeURI(safePath);
 
-    if (!filePath.startsWith(__dirname)) {
-        res.writeHead(403, { 'Content-Type': 'text/plain' });
-        res.end('403 Forbidden');
+    // Candidate locations for local dev and serverless containers
+    const candidates = [
+        path.join(__dirname, decoded),
+        path.join(process.cwd(), decoded),
+        path.join(__dirname, '..', decoded)
+    ];
+
+    let filePath = candidates.find(p => fs.existsSync(p));
+
+    // Fallback: If looking for index.html, check directly in root
+    if (!filePath && safePath === '/index.html') {
+        const indexCandidates = [
+            path.join(__dirname, 'index.html'),
+            path.join(process.cwd(), 'index.html')
+        ];
+        filePath = indexCandidates.find(p => fs.existsSync(p));
+    }
+
+    if (!filePath) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end(`404 Not Found: ${safePath}`);
         return;
     }
 
@@ -257,13 +275,8 @@ function serveStaticFile(req, res, pathname) {
 
     fs.readFile(filePath, (err, content) => {
         if (err) {
-            if (err.code === 'ENOENT') {
-                res.writeHead(404, { 'Content-Type': 'text/plain' });
-                res.end('404 Not Found');
-            } else {
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
-                res.end('Server Error: ' + err.code);
-            }
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Server Error: ' + err.code);
         } else {
             res.writeHead(200, { 'Content-Type': contentType });
             res.end(content);
@@ -283,7 +296,7 @@ async function handleRequest(req, res) {
         return;
     }
 
-    let effectiveUrl = req.url;
+    let effectiveUrl = req.url || '/';
     if (req.headers && req.headers['x-matched-path']) {
         const matched = req.headers['x-matched-path'].split('?')[0];
         if (matched && matched.startsWith('/api') && !matched.startsWith('/api/index')) {
@@ -297,10 +310,29 @@ async function handleRequest(req, res) {
     }
 
     const urlObj = new URL(effectiveUrl, `http://${req.headers.host || 'localhost'}`);
-    const pathname = urlObj.pathname;
+    let pathname = urlObj.pathname;
+    if (pathname.length > 1 && pathname.endsWith('/')) {
+        pathname = pathname.slice(0, -1);
+    }
     const method = req.method;
 
     // --- REST API ENDPOINTS ---
+
+    // DEBUG ENDPOINT FOR VERCEL
+    if (pathname === '/api/debug') {
+        sendJson(res, 200, {
+            url: req.url,
+            effectiveUrl,
+            pathname,
+            method,
+            headers: req.headers,
+            cwd: process.cwd(),
+            dirname: __dirname,
+            cwdFiles: fs.existsSync(process.cwd()) ? fs.readdirSync(process.cwd()) : [],
+            dirnameFiles: fs.existsSync(__dirname) ? fs.readdirSync(__dirname) : []
+        });
+        return;
+    }
 
     // 0. GET /api/db-status
     if (pathname === '/api/db-status' && method === 'GET') {
