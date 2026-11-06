@@ -1,8 +1,148 @@
+// DEFAULT PRODUCT CATALOG (Available offline & instant seed)
+const DEFAULT_PRODUCT_CATALOG = [
+    {
+        id: 1,
+        name: "Fresh Tomatoes",
+        category: "Vegetables",
+        price: 120,
+        image: "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=500"
+    },
+    {
+        id: 2,
+        name: "Red Onions",
+        category: "Vegetables",
+        price: 150,
+        image: "https://images.unsplash.com/photo-1508747703725-719777637510?w=500"
+    },
+    {
+        id: 3,
+        name: "Bananas",
+        category: "Fruits",
+        price: 100,
+        image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500"
+    },
+    {
+        id: 4,
+        name: "Apples",
+        category: "Fruits",
+        price: 280,
+        image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=500"
+    },
+    {
+        id: 5,
+        name: "Fresh Milk",
+        category: "Dairy",
+        price: 75,
+        image: "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500"
+    },
+    {
+        id: 6,
+        name: "Eggs",
+        category: "Dairy",
+        price: 480,
+        image: "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=500"
+    },
+    {
+        id: 7,
+        name: "Rice",
+        category: "Groceries",
+        price: 320,
+        image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500"
+    },
+    {
+        id: 8,
+        name: "Cooking Oil",
+        category: "Groceries",
+        price: 250,
+        image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+    }
+];
+
+const PRODUCT_IMAGE_FALLBACKS = {
+    "fresh tomatoes": "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=500",
+    "red onions": "https://images.unsplash.com/photo-1508747703725-719777637510?w=500",
+    "bananas": "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500",
+    "apples": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=500",
+    "fresh milk": "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500",
+    "eggs": "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=500",
+    "rice": "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500",
+    "cooking oil": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+};
+
+const CATEGORY_IMAGE_FALLBACKS = {
+    "vegetables": "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=500",
+    "fruits": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=500",
+    "dairy": "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500",
+    "groceries": "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500"
+};
+
 // GLOBAL STATE
-let products = [];
+let products = JSON.parse(localStorage.getItem("products")) || DEFAULT_PRODUCT_CATALOG;
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
 let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+// HELPER: FIND CATALOG PRODUCT BY ID OR NAME
+function getCatalogProduct(item) {
+    if (!item) return null;
+    const targetId = Number(item.id);
+    let prod = null;
+    if (!isNaN(targetId) && targetId > 0) {
+        prod = products.find(p => Number(p.id) === targetId) || DEFAULT_PRODUCT_CATALOG.find(p => Number(p.id) === targetId);
+    }
+    if (!prod && item.name) {
+        const cleanName = item.name.trim().toLowerCase();
+        prod = products.find(p => p.name && p.name.trim().toLowerCase() === cleanName) || 
+               DEFAULT_PRODUCT_CATALOG.find(p => p.name && p.name.trim().toLowerCase() === cleanName);
+    }
+    return prod;
+}
+
+// HELPER: RESOLVE SPECIFIC PRODUCT IMAGE (AVOID GENERIC SHELVES)
+function resolveProductImage(item, catalogProd) {
+    const genericStoreImg = 'photo-1542838132-92c53300491e';
+    if (item && item.image && !item.image.includes(genericStoreImg)) {
+        return item.image;
+    }
+    if (catalogProd && catalogProd.image && !catalogProd.image.includes(genericStoreImg)) {
+        return catalogProd.image;
+    }
+    const nameKey = (item && item.name ? item.name : (catalogProd && catalogProd.name ? catalogProd.name : '')).trim().toLowerCase();
+    if (PRODUCT_IMAGE_FALLBACKS[nameKey]) {
+        return PRODUCT_IMAGE_FALLBACKS[nameKey];
+    }
+    const catKey = (item && item.category ? item.category : (catalogProd && catalogProd.category ? catalogProd.category : '')).trim().toLowerCase();
+    if (CATEGORY_IMAGE_FALLBACKS[catKey]) {
+        return CATEGORY_IMAGE_FALLBACKS[catKey];
+    }
+    return 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500';
+}
+
+// SYNC STORED CART ITEMS WITH PRODUCT CATALOG (FIXES OLD/MISSING IMAGES)
+function syncCartWithProducts() {
+    let changed = false;
+    cart.forEach(item => {
+        const prod = getCatalogProduct(item);
+        const resolvedImg = resolveProductImage(item, prod);
+        const resolvedCat = (prod && prod.category) || (item.category && item.category !== 'Organic Groceries' ? item.category : 'Groceries');
+        
+        if (item.image !== resolvedImg) {
+            item.image = resolvedImg;
+            changed = true;
+        }
+        if (item.category !== resolvedCat) {
+            item.category = resolvedCat;
+            changed = true;
+        }
+        if (prod && item.name !== prod.name) {
+            item.name = prod.name;
+            changed = true;
+        }
+    });
+    if (changed) {
+        localStorage.setItem("cart", JSON.stringify(cart));
+    }
+}
 
 // FAVORITES MANAGEMENT
 function saveFavorites() {
@@ -48,15 +188,17 @@ async function fetchProducts() {
     try {
         const response = await fetch('/api/products');
         const data = await response.json();
-        if (data.success && Array.isArray(data.products)) {
+        if (data.success && Array.isArray(data.products) && data.products.length > 0) {
             products = data.products;
             localStorage.setItem("products", JSON.stringify(products));
         }
     } catch (err) {
         console.warn("Node.js API unavailable, loading cached products:", err);
-        products = JSON.parse(localStorage.getItem("products")) || [];
+        products = JSON.parse(localStorage.getItem("products")) || DEFAULT_PRODUCT_CATALOG;
     }
+    syncCartWithProducts();
     displayProducts(products);
+    displayCart();
     updateWishlistBadges();
 }
 
@@ -249,18 +391,20 @@ function scrollCategories(offset) {
 // ADD TO CART
 function addToCart(id, qty = 1) {
     id = Number(id);
-    const product = products.find(item => item.id === id);
+    const product = getCatalogProduct({ id });
     if (!product) return;
 
-    const existing = cart.find(item => item.id === id);
+    const existing = cart.find(item => Number(item.id) === id);
     if (existing) {
         existing.quantity += qty;
+        existing.image = resolveProductImage(existing, product);
+        existing.category = product.category;
     } else {
         cart.push({
             id: product.id,
             name: product.name,
             price: product.price,
-            image: product.image,
+            image: resolveProductImage(product, product),
             category: product.category,
             quantity: qty
         });
@@ -320,16 +464,16 @@ function displayCart() {
             total += subtotal;
             count += item.quantity;
 
-            // Fallback for image and category
-            const catalogProd = products.find(p => p.id === item.id);
-            const itemImg = item.image || (catalogProd ? catalogProd.image : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=500');
-            const itemCat = item.category || (catalogProd ? catalogProd.category : 'Organic Groceries');
+            // Fallback & resolution for image and category
+            const catalogProd = getCatalogProduct(item);
+            const itemImg = resolveProductImage(item, catalogProd);
+            const itemCat = (catalogProd && catalogProd.category) || (item.category && item.category !== 'Organic Groceries' ? item.category : 'Groceries');
             const isFav = isFavorite(item.id);
 
             container.innerHTML += `
                 <div class="cart-item">
                     <div class="cart-item-img-wrap" onclick="openProductModal(${item.id})" title="Click to view ${item.name} details">
-                        <img src="${itemImg}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=500'">
+                        <img src="${itemImg}" alt="${item.name}" onerror="this.onerror=null; this.src='${itemImg}';">
                         <span class="img-preview-hint"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
                     </div>
 
@@ -378,7 +522,7 @@ let currentModalQty = 1;
 
 function openProductModal(id) {
     id = Number(id);
-    const product = products.find(p => p.id === id);
+    const product = getCatalogProduct({ id });
     if (!product) return;
 
     currentModalProduct = product;
@@ -394,7 +538,10 @@ function openProductModal(id) {
     const qtyDisplay = document.getElementById("modal-qty-display");
     const descEl = document.getElementById("modal-product-desc");
 
-    if (imgEl) imgEl.src = product.image;
+    if (imgEl) {
+        imgEl.src = resolveProductImage(product, product);
+        imgEl.alt = product.name;
+    }
     if (titleEl) titleEl.textContent = product.name;
     if (catEl) catEl.textContent = product.category;
     if (priceEl) priceEl.textContent = `KES ${product.price.toLocaleString()}`;
@@ -493,7 +640,7 @@ function renderWishlistModal() {
 
     container.innerHTML = favProducts.map(p => `
         <div class="wishlist-item">
-            <img src="${p.image}" alt="${p.name}" onclick="closeWishlistModal(); openProductModal(${p.id});" style="cursor: pointer;" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?w=500'">
+            <img src="${resolveProductImage(p, p)}" alt="${p.name}" onclick="closeWishlistModal(); openProductModal(${p.id});" style="cursor: pointer;" onerror="this.onerror=null; this.src='${resolveProductImage(p, p)}';">
             <div class="wishlist-item-info">
                 <h4 onclick="closeWishlistModal(); openProductModal(${p.id});" style="cursor: pointer;">${p.name}</h4>
                 <span class="price">KES ${p.price}</span>
@@ -510,7 +657,8 @@ function renderWishlistModal() {
 
 // CHANGE QUANTITY
 function changeQuantity(id, amount) {
-    const item = cart.find(product => product.id === id);
+    id = Number(id);
+    const item = cart.find(product => Number(product.id) === id);
     if (!item) return;
 
     item.quantity += amount;
@@ -523,7 +671,8 @@ function changeQuantity(id, amount) {
 
 // REMOVE ITEM
 function removeItem(id) {
-    cart = cart.filter(item => item.id !== id);
+    id = Number(id);
+    cart = cart.filter(item => Number(item.id) !== id);
     saveCart();
 }
 
@@ -893,6 +1042,7 @@ function initHeroBackgroundSlider() {
 }
 
 // INITIALIZE STORE ON PAGE LOAD
+syncCartWithProducts();
 fetchProducts();
 displayCart();
 updateAccountLink();
