@@ -481,25 +481,28 @@ nav#main-nav a.nav-link.active {
 .btn-primary {
     background: var(--primary);
     color: #FFFFFF;
+    box-shadow: 0 4px 14px rgba(5, 166, 72, 0.28);
 }
 
 .btn-primary:hover {
     background: var(--primary-dark);
-    box-shadow: 0 4px 12px rgba(5, 166, 72, 0.3);
+    box-shadow: 0 6px 18px rgba(5, 166, 72, 0.38);
+    transform: translateY(-2px);
 }
 
 .btn-outline {
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.12);
     color: #FFFFFF;
-    border: 1.5px solid rgba(255, 255, 255, 0.45);
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
 
 .btn-outline:hover {
-    background: #FFFFFF;
-    color: var(--dark);
-    border-color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.7);
+    color: #FFFFFF;
+    transform: translateY(-2px);
 }
 
 .hero-carousel-dots {
@@ -603,21 +606,29 @@ nav#main-nav a.nav-link.active {
     margin-bottom: 14px;
 }
 
-.btn-side-shop {
+.btn-card-link {
     display: inline-flex;
     align-items: center;
-    background: var(--primary);
-    color: #FFFFFF;
-    font-size: 12px;
+    gap: 8px;
+    font-size: 13px;
     font-weight: 700;
-    padding: 7px 16px;
-    border-radius: 20px;
+    color: var(--dark);
     text-decoration: none;
-    transition: background 0.2s ease;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.btn-side-shop:hover {
-    background: var(--primary-dark);
+.btn-card-link i {
+    font-size: 11px;
+    color: var(--primary);
+    transition: transform 0.2s ease;
+}
+
+.btn-card-link:hover {
+    color: var(--primary-dark);
+}
+
+.btn-card-link:hover i {
+    transform: translateX(4px);
 }
 
 .side-card-img-wrap {
@@ -821,21 +832,8 @@ nav#main-nav a.nav-link.active {
     margin-bottom: 14px;
 }
 
-.btn-promo-shop {
-    display: inline-flex;
-    align-items: center;
-    background: var(--primary);
-    color: #FFFFFF;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 6px 14px;
-    border-radius: 20px;
-    text-decoration: none;
-    transition: background 0.2s;
-}
-
-.btn-promo-shop:hover {
-    background: var(--primary-dark);
+.promo-card-text .btn-card-link {
+    margin-top: 4px;
 }
 
 .promo-card-visual {
@@ -1060,18 +1058,21 @@ nav#main-nav a.nav-link.active {
 .btn-deals {
     background: var(--primary);
     color: #FFFFFF;
-    padding: 11px 26px;
-    border-radius: 6px;
+    padding: 12px 28px;
+    border-radius: 8px;
     font-weight: 700;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    transition: background 0.2s;
+    box-shadow: 0 4px 14px rgba(5, 166, 72, 0.28);
+    transition: all 0.2s ease;
 }
 
 .btn-deals:hover {
     background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(5, 166, 72, 0.38);
 }
 
 .deals-visual-col {
@@ -1080,14 +1081,15 @@ nav#main-nav a.nav-link.active {
     justify-content: center;
     align-items: center;
     position: relative;
+    filter: drop-shadow(0 16px 36px rgba(10, 32, 20, 0.16));
 }
 
 .discount-badge-circle {
     position: absolute;
-    top: 10px;
+    top: 14px;
     left: 20px;
-    width: 72px;
-    height: 72px;
+    width: 68px;
+    height: 68px;
     border-radius: 50%;
     background: var(--dark-forest);
     color: #FFFFFF;
@@ -1095,18 +1097,19 @@ nav#main-nav a.nav-link.active {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 14px rgba(15, 46, 29, 0.3);
-    z-index: 2;
+    box-shadow: 0 4px 14px rgba(15, 46, 29, 0.35);
+    z-index: 3;
+    border: 2px solid rgba(255, 255, 255, 0.85);
 }
 
 .discount-badge-circle .badge-num {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 800;
     line-height: 1;
 }
 
 .discount-badge-circle .badge-text {
-    font-size: 10px;
+    font-size: 9.5px;
     letter-spacing: 0.5px;
     font-weight: 700;
 }
@@ -1116,13 +1119,15 @@ nav#main-nav a.nav-link.active {
     width: 100%;
     height: auto;
     object-fit: cover;
-    border-radius: 16px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-    transition: transform 0.3s ease;
+    clip-path: polygon(0% 10%, 10% 0%, 100% 0%, 100% 88%, 90% 100%, 0% 100%);
+    -webkit-clip-path: polygon(0% 10%, 10% 0%, 100% 0%, 100% 88%, 90% 100%, 0% 100%);
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), clip-path 0.35s ease, -webkit-clip-path 0.35s ease;
 }
 
 .deals-visual-col:hover .deals-basket-img {
-    transform: scale(1.02);
+    transform: scale(1.03);
+    clip-path: polygon(0% 8%, 8% 0%, 100% 0%, 100% 92%, 92% 100%, 0% 100%);
+    -webkit-clip-path: polygon(0% 8%, 8% 0%, 100% 0%, 100% 92%, 92% 100%, 0% 100%);
 }
 
 /* ==========================================================================
