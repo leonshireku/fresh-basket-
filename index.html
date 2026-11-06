@@ -536,7 +536,7 @@
                 <i class="fa-solid fa-credit-card" aria-hidden="true"></i> Proceed to Checkout
             </button>
             <div class="cart-secure-notice">
-                <i class="fa-solid fa-shield-halved"></i> 100% Organic Farm Quality • Pay with M-Pesa or Cash on Delivery
+                <i class="fa-solid fa-shield-halved"></i> 100% Organic Farm Quality • Guaranteed Fresh & Secure Delivery
             </div>
         </div>
     </div>
@@ -596,11 +596,11 @@
 
                 <!-- Bottom CTA Buttons -->
                 <div class="modal-bottom-cta">
-                    <button type="button" class="btn btn-outline modal-fav-pill" id="modal-fav-toggle-btn" onclick="toggleCurrentModalFavorite()">
-                        <i class="fa-regular fa-heart"></i> Favorite
+                    <button type="button" class="modal-fav-square-btn" id="modal-fav-toggle-btn" onclick="toggleCurrentModalFavorite()" title="Add to favorites" aria-label="Favorite">
+                        <i class="fa-regular fa-heart"></i>
                     </button>
                     <button type="button" class="btn btn-primary modal-add-cart-btn" onclick="addModalProductToCart()">
-                        <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                        <i class="fa-solid fa-cart-shopping"></i> <span>Add to Cart</span>
                     </button>
                 </div>
             </div>
@@ -627,8 +627,8 @@
         <input type="text" id="delivery-address" placeholder="Delivery address" required>
         <input type="tel" id="delivery-phone" placeholder="Phone number (e.g. 0712345678)" required>
         <select id="payment-method">
-            <option value="M-Pesa">M-Pesa (Instant Mobile Money)</option>
             <option value="Cash on Delivery">Cash on Delivery</option>
+            <option value="Online Payment">Card / Digital Payment</option>
         </select>
         <button class="btn btn-primary" onclick="placeOrder()"><i class="fa-solid fa-check" aria-hidden="true"></i> Place Order</button>
     </div>

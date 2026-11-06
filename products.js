@@ -450,7 +450,8 @@ function updateModalFavButton(id) {
     }
     if (favPillBtn) {
         favPillBtn.classList.toggle("active", isFav);
-        favPillBtn.innerHTML = `<i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i> ${isFav ? 'Favorited' : 'Favorite'}`;
+        favPillBtn.innerHTML = `<i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-heart"></i>`;
+        favPillBtn.title = isFav ? "Remove from favorites" : "Add to favorites";
     }
 }
 
