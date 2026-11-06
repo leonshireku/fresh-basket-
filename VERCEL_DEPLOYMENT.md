@@ -73,3 +73,4 @@ Incoming Request
 - `server.js`: Dual-mode (runs standalone locally or serverless on Vercel).
 - `db.js`: Enhanced with automatic TLS/SSL support for cloud database connections.
 - `.vercelignore`: Keeps sensitive files and local logs out of the deployment bundle.
+
