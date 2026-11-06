@@ -2,7 +2,6 @@
   "name": "freshbasket-simple-ecommerce",
   "version": "1.0.0",
   "description": "FreshBasket - Simple E-Commerce Web Application",
-  "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },

@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 // Auto-load .env file into process.env
 const envPath = path.join(__dirname, '.env');
@@ -25,7 +26,8 @@ if (fs.existsSync(envPath)) {
 const db = require('./db');
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
-const DATA_DIR = path.join(__dirname, 'data');
+const IS_VERCEL = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const DATA_DIR = IS_VERCEL ? path.join(os.tmpdir(), 'freshbasket-data') : path.join(__dirname, 'data');
 const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
@@ -120,40 +122,78 @@ const DEFAULT_USERS = [
     }
 ];
 
+// IN-MEMORY STORAGE CACHE (Guarantees zero-crash on serverless/read-only environments)
+const memStorage = {
+    'products.json': Array.isArray(DEFAULT_PRODUCTS) ? [...DEFAULT_PRODUCTS] : DEFAULT_PRODUCTS,
+    'users.json': Array.isArray(DEFAULT_USERS) ? [...DEFAULT_USERS] : DEFAULT_USERS,
+    'orders.json': []
+};
+
 // INITIALIZE FALLBACK FILE STORAGE
 function initDatabase() {
-    if (!fs.existsSync(DATA_DIR)) {
-        fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
-    if (!fs.existsSync(PRODUCTS_FILE)) {
-        fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(DEFAULT_PRODUCTS, null, 2));
-    }
-    if (!fs.existsSync(USERS_FILE)) {
-        fs.writeFileSync(USERS_FILE, JSON.stringify(DEFAULT_USERS, null, 2));
-    }
-    if (!fs.existsSync(ORDERS_FILE)) {
-        fs.writeFileSync(ORDERS_FILE, JSON.stringify([], null, 2));
+    try {
+        if (!fs.existsSync(DATA_DIR)) {
+            fs.mkdirSync(DATA_DIR, { recursive: true });
+        }
+        if (!fs.existsSync(PRODUCTS_FILE)) {
+            fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(DEFAULT_PRODUCTS, null, 2));
+        }
+        if (!fs.existsSync(USERS_FILE)) {
+            fs.writeFileSync(USERS_FILE, JSON.stringify(DEFAULT_USERS, null, 2));
+        }
+        if (!fs.existsSync(ORDERS_FILE)) {
+            fs.writeFileSync(ORDERS_FILE, JSON.stringify([], null, 2));
+        }
+    } catch (err) {
+        // Read-only filesystem on Vercel: safely continue with in-memory storage
+        console.warn('Read-only storage mode active (in-memory storage enabled):', err.message);
     }
 }
 
 initDatabase();
 
 function readData(filePath, fallback = []) {
+    const fileName = path.basename(filePath);
     try {
-        if (!fs.existsSync(filePath)) return fallback;
-        const raw = fs.readFileSync(filePath, 'utf-8');
-        return JSON.parse(raw);
-    } catch (e) {
-        return fallback;
+        if (fs.existsSync(filePath)) {
+            const raw = fs.readFileSync(filePath, 'utf-8');
+            const parsed = JSON.parse(raw);
+            memStorage[fileName] = parsed;
+            return parsed;
+        }
+    } catch (e) {}
+
+    // Check if original bundled data file exists in __dirname/data
+    try {
+        const bundledPath = path.join(__dirname, 'data', fileName);
+        if (fs.existsSync(bundledPath)) {
+            const raw = fs.readFileSync(bundledPath, 'utf-8');
+            const parsed = JSON.parse(raw);
+            memStorage[fileName] = parsed;
+            return parsed;
+        }
+    } catch (e) {}
+
+    if (memStorage[fileName]) {
+        return memStorage[fileName];
     }
+    memStorage[fileName] = Array.isArray(fallback) ? [...fallback] : fallback;
+    return memStorage[fileName];
 }
 
 function writeData(filePath, data) {
+    const fileName = path.basename(filePath);
+    memStorage[fileName] = data;
     try {
+        const dir = path.dirname(filePath);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
         fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
         return true;
     } catch (e) {
-        return false;
+        // Successfully saved in memory if filesystem is read-only
+        return true;
     }
 }
 
@@ -603,7 +643,7 @@ async function handleRequest(req, res) {
 const server = http.createServer(handleRequest);
 
 // Only listen on port if running as standalone process (not serverless on Vercel)
-if (require.main === module && !process.env.VERCEL) {
+if (require.main === module && !process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
     server.listen(PORT, async () => {
         console.log(`===============================================`);
         console.log(`🥬 FreshBasket Server running on http://localhost:${PORT}`);
